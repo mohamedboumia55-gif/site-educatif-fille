@@ -3,54 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L'école magique</title>
+  <title>L'école magique 🦉</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <span style="font-size:2rem;">📚</span>
-    <h1>L'école magique</h1>
-    <div class="header-stars" style="display:flex;align-items:center;gap:10px;">
-      <span style="color:white;font-size:0.85rem;font-weight:700;" id="user-name-display"></span>
-      <span class="score-badge">⭐ <span id="score-total">0</span></span>
-      <button onclick="Profiles.logout()" title="Changer d'utilisateur"
-        style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;">🔄</button>
+  <header class="hud">
+    <div class="hud-top">
+      <div class="hud-title">📚 L'école magique</div>
+      <div class="hud-stats">
+        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <button class="btn-logout" onclick="Profiles.logout()" title="Changer">🔄</button>
+      </div>
     </div>
+    <div class="xp-label">
+      <span id="user-name-display" style="font-size:0.78rem;font-weight:800;">—</span>
+      <span>Niv. <span id="hud-level">1</span></span>
+    </div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
   </header>
 
   <main>
-    <div class="accueil-hero">
-      <h2>Bonjour <span id="prenom-hero">!</span></h2>
-      <p>Ton professeur virtuel est là pour t'aider. Choisis une matière pour commencer !</p>
+    <div class="hero">
+      <h2>Bonjour <span id="prenom-hero"></span>!</h2>
+      <p>Choisis une matière pour commencer ✨</p>
     </div>
 
     <div class="teacher-zone">
-      <div id="teacher-avatar">🦉</div>
-      <div class="bubble" id="teacher-bubble">
-        Choisis une matière pour qu'on commence ensemble !
+      <div id="teacher-avatar" class="avatar-idle">🦉</div>
+      <div class="speech-bubble" id="teacher-bubble">
+        Choisis une matière et on commence !
       </div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
 
-    <nav>
-      <a href="pages/lecture.html" class="nav-btn btn-lecture">
-        <span class="emoji">📖</span>
-        Lecture
+    <div class="subject-grid">
+      <a href="pages/lecture.html" class="subject-card s-lecture">
+        <span class="s-emoji">📖</span>
+        <span class="s-label">Lecture</span>
+        <span class="s-sub">Textes &amp; questions</span>
       </a>
-      <a href="pages/grammaire.html" class="nav-btn btn-grammaire">
-        <span class="emoji">✏️</span>
-        Grammaire
+      <a href="pages/grammaire.html" class="subject-card s-grammaire">
+        <span class="s-emoji">✏️</span>
+        <span class="s-label">Grammaire</span>
+        <span class="s-sub">Nature des mots</span>
       </a>
-      <a href="pages/conjugaison.html" class="nav-btn btn-conjugaison">
-        <span class="emoji">🔤</span>
-        Conjugaison
+      <a href="pages/conjugaison.html" class="subject-card s-conjugaison">
+        <span class="s-emoji">🔤</span>
+        <span class="s-label">Conjugaison</span>
+        <span class="s-sub">Présent, passé, futur</span>
       </a>
-      <a href="pages/orthographe.html" class="nav-btn btn-ortho">
-        <span class="emoji">🔡</span>
-        Orthographe
+      <a href="pages/orthographe.html" class="subject-card s-ortho">
+        <span class="s-emoji">🔡</span>
+        <span class="s-label">Orthographe</span>
+        <span class="s-sub">Dictée &amp; vocabulaire</span>
       </a>
-    </nav>
+    </div>
   </main>
 
   <script src="js/teacher.js"></script>
@@ -58,26 +68,21 @@
   <script>
     window.addEventListener('load', () => {
       Teacher.init();
-
       initProfileSystem((name) => {
-        // Personnaliser l'accueil avec le prénom
-        const prenom = document.getElementById('prenom-hero');
-        if (prenom) prenom.textContent = name + ' !';
-        document.getElementById('user-name-display').textContent = name;
-
+        document.getElementById('prenom-hero').textContent = name;
         setTimeout(() => {
-          Teacher.parler("Bonjour " + name + " ! Je suis Professeur Chouette, ton professeur virtuel. Je suis là pour t'aider à progresser en français. Clique sur une matière pour commencer !");
-          document.getElementById('teacher-bubble').textContent = "Bonjour " + name + " ! Clique sur une matière pour commencer !";
-        }, 600);
+          Teacher.encourager("Bonjour " + name + " ! Je suis Professeur Chouette. Clique sur une matière pour qu'on commence ensemble !");
+          document.getElementById('teacher-bubble').textContent = "Clique sur une matière pour commencer !";
+        }, 700);
       });
     });
 
     function activerMicro() {
       if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
       Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter((texte) => {
-          document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + texte + "\"";
-          Teacher.parler("Tu as dit : " + texte + ". Clique sur une matière pour commencer !");
+        Teacher.ecouter((t) => {
+          document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"";
+          Teacher.parler("Tu as dit : " + t + " . Clique sur une matière pour commencer !");
         });
       });
     }
