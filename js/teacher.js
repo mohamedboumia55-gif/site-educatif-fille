@@ -28,15 +28,25 @@ const Teacher = {
     }
   },
 
+  _nettoyer(texte) {
+    // Retire les emojis pour la synthèse vocale (évite "sire ampoule", "étoile", etc.)
+    return texte
+      .replace(/\p{Extended_Pictographic}/gu, '')
+      .replace(/[‍️]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+
   _speak(texte, rate, pitch, callback) {
     this.synth.cancel();
-    const u = new SpeechSynthesisUtterance(texte);
+    const tts = this._nettoyer(texte) || texte;
+    const u = new SpeechSynthesisUtterance(tts);
     u.lang = 'fr-FR'; u.rate = rate; u.pitch = pitch;
     if (this.voiceFR) u.voice = this.voiceFR;
     this._setState('talking');
     u.onend = u.onerror = () => { this._setState('idle'); if (callback) callback(); };
     this.synth.speak(u);
-    this._updateBubble(texte);
+    this._updateBubble(texte); // la bulle garde les emojis pour l'affichage
   },
 
   parler(t, cb)     { this._speak(t, 0.95, 1.1, cb); },
