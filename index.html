@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'école magique</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <span style="font-size:2rem;">📚</span>
+    <h1>L'école magique</h1>
+    <div class="header-stars" style="display:flex;align-items:center;gap:10px;">
+      <span style="color:white;font-size:0.85rem;font-weight:700;" id="user-name-display"></span>
+      <span class="score-badge">⭐ <span id="score-total">0</span></span>
+      <button onclick="Profiles.logout()" title="Changer d'utilisateur"
+        style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;">🔄</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="accueil-hero">
+      <h2>Bonjour <span id="prenom-hero">!</span></h2>
+      <p>Ton professeur virtuel est là pour t'aider. Choisis une matière pour commencer !</p>
+    </div>
+
+    <div class="teacher-zone">
+      <div id="teacher-avatar">🦉</div>
+      <div class="bubble" id="teacher-bubble">
+        Choisis une matière pour qu'on commence ensemble !
+      </div>
+      <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
+    </div>
+
+    <nav>
+      <a href="pages/lecture.html" class="nav-btn btn-lecture">
+        <span class="emoji">📖</span>
+        Lecture
+      </a>
+      <a href="pages/grammaire.html" class="nav-btn btn-grammaire">
+        <span class="emoji">✏️</span>
+        Grammaire
+      </a>
+      <a href="pages/conjugaison.html" class="nav-btn btn-conjugaison">
+        <span class="emoji">🔤</span>
+        Conjugaison
+      </a>
+      <a href="pages/orthographe.html" class="nav-btn btn-ortho">
+        <span class="emoji">🔡</span>
+        Orthographe
+      </a>
+    </nav>
+  </main>
+
+  <script src="js/teacher.js"></script>
+  <script src="js/profiles.js"></script>
+  <script>
+    window.addEventListener('load', () => {
+      Teacher.init();
+
+      initProfileSystem((name) => {
+        // Personnaliser l'accueil avec le prénom
+        const prenom = document.getElementById('prenom-hero');
+        if (prenom) prenom.textContent = name + ' !';
+        document.getElementById('user-name-display').textContent = name;
+
+        setTimeout(() => {
+          Teacher.parler("Bonjour " + name + " ! Je suis Professeur Chouette, ton professeur virtuel. Je suis là pour t'aider à progresser en français. Clique sur une matière pour commencer !");
+          document.getElementById('teacher-bubble').textContent = "Bonjour " + name + " ! Clique sur une matière pour commencer !";
+        }, 600);
+      });
+    });
+
+    function activerMicro() {
+      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
+      Teacher.parler("Je t'écoute !", () => {
+        Teacher.ecouter((texte) => {
+          document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + texte + "\"";
+          Teacher.parler("Tu as dit : " + texte + ". Clique sur une matière pour commencer !");
+        });
+      });
+    }
+  </script>
+</body>
+</html>

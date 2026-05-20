@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture – L'école magique</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="../index.html" style="color:white;font-size:1.5rem;text-decoration:none;">←</a>
+    <span style="font-size:2rem;">📖</span>
+    <h1>Lecture &amp; Compréhension</h1>
+    <div class="header-stars" style="display:flex;align-items:center;gap:10px;">
+      <span style="color:white;font-size:0.85rem;font-weight:700;" id="user-name-display"></span>
+      <span class="score-badge">⭐ <span id="score-total">0</span></span>
+      <button onclick="Profiles.logout()" title="Changer d'utilisateur"
+        style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1rem;">🔄</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="teacher-zone">
+      <div id="teacher-avatar">🦉</div>
+      <div class="bubble" id="teacher-bubble">Je vais te lire un texte. Écoute bien, ensuite je te poserai des questions !</div>
+      <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
+    </div>
+
+    <div class="exercice-zone">
+      <div class="exercice-card">
+        <h2>📄 Le texte du jour</h2>
+        <p id="texte-lecture" style="line-height:1.8;font-size:1.05rem;color:#444;">
+          Un matin, Léa se leva très tôt. Le soleil n'était pas encore levé, mais elle entendit un bruit bizarre dans le jardin. Elle regarda par la fenêtre et vit un petit hérisson qui cherchait de la nourriture. Léa descendit doucement pour ne pas l'effrayer. Elle posa quelques morceaux de pomme sur le sol. Le hérisson s'approcha lentement, renifla, puis mangea. Léa était ravie.
+        </p>
+        <button class="valider-btn" onclick="lireTexte()">🔊 Lire le texte à voix haute</button>
+      </div>
+
+      <div class="exercice-card" id="zone-questions" style="display:none;">
+        <h2>❓ Questions de compréhension</h2>
+        <div id="question-container"></div>
+        <div class="feedback" id="feedback-lecture"></div>
+      </div>
+
+      <div style="text-align:center;margin-top:10px;">
+        <button class="valider-btn" onclick="window.location.href='../index.html'" id="btn-suivant" style="display:none;background:#c44dff;">
+          Retour à l'accueil ➜
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/teacher.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script>
+    const texte = "Un matin, Léa se leva très tôt. Le soleil n'était pas encore levé, mais elle entendit un bruit bizarre dans le jardin. Elle regarda par la fenêtre et vit un petit hérisson qui cherchait de la nourriture. Léa descendit doucement pour ne pas l'effrayer. Elle posa quelques morceaux de pomme sur le sol. Le hérisson s'approcha lentement, renifla, puis mangea. Léa était ravie.";
+
+    const questions = [
+      {
+        question: "Qu'est-ce que Léa a entendu le matin ?",
+        choix: ["Un chien qui aboyait", "Un bruit bizarre dans le jardin", "La pluie qui tombait", "Sa maman qui chantait"],
+        bonne: 1
+      },
+      {
+        question: "Quel animal Léa a-t-elle vu ?",
+        choix: ["Un lapin", "Un chat", "Un hérisson", "Un écureuil"],
+        bonne: 2
+      },
+      {
+        question: "Qu'est-ce que Léa a posé sur le sol pour l'animal ?",
+        choix: ["Du pain", "Des morceaux de pomme", "Du lait", "Des graines"],
+        bonne: 1
+      }
+    ];
+
+    let questionIndex = 0;
+
+    window.addEventListener('load', () => {
+      Teacher.init();
+      initProfileSystem((name) => {
+        setTimeout(() => {
+          Teacher.parler("Bienvenue dans la lecture " + name + " ! Je vais te lire un texte. Écoute bien, ensuite je te poserai des questions !");
+        }, 600);
+      });
+    });
+
+    function lireTexte() {
+      Teacher.parler(texte, () => {
+        document.getElementById('zone-questions').style.display = 'block';
+        afficherQuestion(0);
+        Teacher.parler("Bien ! Maintenant réponds à mes questions.");
+      });
+      document.getElementById('teacher-bubble').textContent = "J'écoute bien le texte...";
+    }
+
+    function afficherQuestion(index) {
+      if (index >= questions.length) {
+        document.getElementById('question-container').innerHTML = '<p style="font-size:1.1rem;font-weight:700;color:#1a6e2e;">🎉 Bravo ! Tu as répondu à toutes les questions !</p>';
+        document.getElementById('btn-suivant').style.display = 'inline-block';
+        Profiles.saveProgression('lecture', { termine: true, date: new Date().toLocaleDateString() });
+        Teacher.parler("Excellent travail ! Tu as répondu à toutes les questions de compréhension. Tu es vraiment courageuse !");
+        return;
+      }
+      const q = questions[index];
+      let html = `<p style="font-weight:700;margin-bottom:12px;">${q.question}</p><div class="choix-grid">`;
+      q.choix.forEach((c, i) => {
+        html += `<button class="choix-btn" onclick="verifierReponse(${i}, ${q.bonne}, this)">${c}</button>`;
+      });
+      html += '</div>';
+      document.getElementById('question-container').innerHTML = html;
+      document.getElementById('feedback-lecture').className = 'feedback';
+      Teacher.parler(q.question);
+    }
+
+    function verifierReponse(index, bonne, btn) {
+      const btns = document.querySelectorAll('.choix-btn');
+      btns.forEach(b => b.disabled = true);
+      const feedback = document.getElementById('feedback-lecture');
+
+      if (index === bonne) {
+        btn.classList.add('correct');
+        feedback.textContent = '✅ Bravo ! C\'est la bonne réponse !';
+        feedback.className = 'feedback bravo';
+        const newScore = Profiles.addPoint();
+        document.getElementById('score-total').textContent = newScore;
+        Teacher.parler("Bravo ! C'est la bonne réponse ! Continue comme ça !", () => {
+          questionIndex++;
+          setTimeout(() => afficherQuestion(questionIndex), 800);
+        });
+      } else {
+        btn.classList.add('incorrect');
+        btns[bonne].classList.add('correct');
+        feedback.textContent = '❌ Pas tout à fait... La bonne réponse était : ' + questions[questionIndex].choix[bonne];
+        feedback.className = 'feedback erreur';
+        Teacher.parler("Pas tout à fait, mais ne te décourage pas ! La bonne réponse était : " + questions[questionIndex].choix[bonne], () => {
+          questionIndex++;
+          setTimeout(() => afficherQuestion(questionIndex), 1200);
+        });
+      }
+    }
+
+    function activerMicro() {
+      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
+      Teacher.parler("Je t'écoute !", () => {
+        Teacher.ecouter((t) => {
+          document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"";
+        });
+      });
+    }
+  </script>
+</body>
+</html>
