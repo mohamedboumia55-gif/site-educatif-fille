@@ -8,137 +8,166 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Poppins', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      background: linear-gradient(160deg, #1a0a4e 0%, #2d1060 35%, #0d1a5c 70%, #1a0a4e 100%);
       background-attachment: fixed;
       color: white;
     }
 
-    /* ── Teacher Avatar ─────────────────────────────────────── */
-    @keyframes float-t   { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-8px)} }
-    @keyframes bounce-t  { 0%,100%{transform:scale(1)}        50%{transform:scale(1.12)} }
-    @keyframes pulse-t   { 0%,100%{opacity:0.8;transform:scale(1)} 50%{opacity:1;transform:scale(1.06)} }
-    @keyframes celebrate { 0%,100%{transform:rotate(0)}       25%{transform:rotate(-12deg)} 75%{transform:rotate(12deg)} }
-    @keyframes spin-ring { from{transform:rotate(0deg)}        to{transform:rotate(360deg)} }
+    /* ── Avatar ─────────────────────────────────────────────── */
+    @keyframes float-t    { 0%,100%{transform:translateY(0)}     50%{transform:translateY(-10px)} }
+    @keyframes bounce-t   { 0%,100%{transform:scale(1)}          50%{transform:scale(1.15)} }
+    @keyframes pulse-t    { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+    @keyframes celebrate  { 0%,100%{transform:rotate(0) scale(1)} 25%{transform:rotate(-15deg) scale(1.1)} 75%{transform:rotate(15deg) scale(1.1)} }
+    @keyframes spin-ring  { from{transform:rotate(0)}              to{transform:rotate(360deg)} }
 
-    #teacher-avatar.avatar-idle      .t-emoji { animation: float-t   3s  ease-in-out infinite; }
-    #teacher-avatar.avatar-talking   .t-emoji { animation: bounce-t  0.4s ease      infinite; }
-    #teacher-avatar.avatar-listening .t-emoji { animation: pulse-t   1s  ease      infinite; }
-    #teacher-avatar.avatar-celebrate .t-emoji { animation: celebrate 0.4s ease      infinite; }
+    #teacher-avatar.avatar-idle      .t-emoji { animation: float-t   3s   ease-in-out infinite; }
+    #teacher-avatar.avatar-talking   .t-emoji { animation: bounce-t  0.4s ease       infinite; }
+    #teacher-avatar.avatar-listening .t-emoji { animation: pulse-t   1s   ease       infinite; }
+    #teacher-avatar.avatar-celebrate .t-emoji { animation: celebrate 0.45s ease      infinite; }
 
-    .t-ring-wrap { position:relative; width:84px; height:84px; flex-shrink:0; }
+    .t-ring-wrap { position:relative; width:96px; height:96px; flex-shrink:0; }
     .t-ring {
       position:absolute; inset:0; border-radius:50%;
-      background:conic-gradient(from 0deg,#a855f7,#3b82f6,#ec4899,#10b981,#a855f7);
-      animation:spin-ring 3s linear infinite;
+      background: conic-gradient(from 0deg, #f472b6, #818cf8, #34d399, #fbbf24, #f472b6);
+      animation: spin-ring 3s linear infinite;
     }
     .t-inner {
       position:absolute; inset:4px; border-radius:50%;
-      background:#1e1b4b;
+      background: #2d1060;
       display:flex; align-items:center; justify-content:center;
     }
-    .t-emoji { font-size:2.5rem; display:block; line-height:1; }
+    .t-emoji { font-size:3rem; display:block; line-height:1; }
 
-    /* ── Speech Bubble ──────────────────────────────────────── */
+    /* ── Bulle ──────────────────────────────────────────────── */
     .speech-bubble {
-      position:relative; background:white; color:#1e1b4b;
-      border-radius:18px; padding:10px 14px; font-size:0.88rem;
-      font-weight:600; line-height:1.45; min-height:38px;
-      transition:opacity 0.25s;
+      background: white; color: #1a0a4e;
+      border-radius: 20px; padding: 12px 16px;
+      font-size: 0.9rem; font-weight: 600; line-height: 1.5;
+      min-height: 44px; max-width: 260px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: opacity .25s;
     }
     .speech-bubble::before {
-      content:''; position:absolute; left:-8px; top:14px;
-      border:8px solid transparent; border-right-color:white;
+      content:''; position:absolute; left:-9px; top:16px;
+      border:9px solid transparent; border-right-color:white;
     }
 
     /* ── HUD ────────────────────────────────────────────────── */
     .hud {
       position:sticky; top:0; z-index:50;
-      background:rgba(15,12,41,0.88);
-      backdrop-filter:blur(20px);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      padding:10px 16px 8px;
+      background: rgba(15, 5, 50, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 16px 8px;
     }
     .glass-chip {
-      background:rgba(255,255,255,0.1);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:20px; padding:3px 10px;
-      font-size:0.78rem; font-weight:700;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 0.78rem; font-weight: 700;
     }
-    .heart-empty { filter:grayscale(1) opacity(0.2); }
+    .heart-empty { filter: grayscale(1) opacity(.2); }
+    .progress-track { background: rgba(255,255,255,0.12); border-radius: 99px; overflow: hidden; }
+    .progress-fill  { height:100%; transition: width .6s ease; border-radius: 99px; }
 
-    /* ── Cards & Buttons ────────────────────────────────────── */
-    .glass-card {
-      background:rgba(255,255,255,0.07);
-      backdrop-filter:blur(20px);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:20px;
+    /* ── Carte exercice (fond blanc) ────────────────────────── */
+    .ex-card {
+      background: white; color: #1a0a4e;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      padding: 20px;
     }
+
+    /* ── Boutons choix ──────────────────────────────────────── */
     .choix-btn {
-      display:block; width:100%;
-      background:rgba(255,255,255,0.08);
-      border:2px solid rgba(255,255,255,0.15);
-      border-radius:14px; padding:13px 16px;
-      text-align:left; font-weight:600; font-size:0.9rem;
-      color:white; cursor:pointer;
-      transition:all 0.18s; backdrop-filter:blur(10px);
+      display: block; width: 100%;
+      background: #f5f0ff;
+      border: 2.5px solid #e0d4ff;
+      border-radius: 16px; padding: 14px 18px;
+      text-align: left; font-weight: 700; font-size: 0.92rem;
+      color: #1a0a4e; cursor: pointer;
+      transition: all .18s;
     }
-    .choix-btn:hover:not(:disabled) { background:rgba(255,255,255,0.18); transform:translateY(-2px); }
-    .choix-btn.correct  { background:rgba(34,197,94,0.22)  !important; border-color:#22c55e !important; }
-    .choix-btn.incorrect{ background:rgba(239,68,68,0.22)  !important; border-color:#ef4444 !important; }
-
-    /* ── Progress ───────────────────────────────────────────── */
-    .progress-track { background:rgba(255,255,255,0.1); border-radius:99px; overflow:hidden; }
-    .progress-fill  { height:100%; transition:width 0.5s ease; border-radius:99px; }
-
-    /* ── Lesson content ─────────────────────────────────────── */
-    .lesson-content h3     { font-size:1.05rem; font-weight:800; color:#a5b4fc; margin-bottom:10px; }
-    .lesson-content p      { margin-bottom:8px; font-size:0.9rem; line-height:1.5; }
-    .lesson-content ul     { list-style:none; padding:0; margin:0 0 8px; }
-    .lesson-content li     { padding-left:4px; margin-bottom:5px; font-size:0.88rem; }
-    .lesson-content strong { color:#fde68a; }
-    .lesson-content em     { color:rgba(255,255,255,0.65); font-style:italic; }
-    .lesson-content table  { width:100%; border-collapse:collapse; margin:8px 0; font-size:0.85rem; }
-    .lesson-content td,
-    .lesson-content th     { padding:5px 8px; }
-    .lesson-content u      { text-decoration-color:#a5b4fc; }
+    .choix-btn:hover:not(:disabled) {
+      background: #ede0ff; border-color: #a855f7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(168,85,247,.25);
+    }
+    .choix-btn.correct {
+      background: #dcfce7 !important; border-color: #16a34a !important; color: #14532d !important;
+    }
+    .choix-btn.incorrect {
+      background: #fee2e2 !important; border-color: #dc2626 !important; color: #7f1d1d !important;
+    }
+    .choix-btn:disabled { cursor: default; }
 
     /* ── Feedback ───────────────────────────────────────────── */
-    .fb-correct   { background:rgba(34,197,94,0.18);  border:1px solid rgba(34,197,94,0.4);  color:#86efac; }
-    .fb-incorrect { background:rgba(239,68,68,0.18);  border:1px solid rgba(239,68,68,0.4);  color:#fca5a5; }
-
-    /* ── Confetti ───────────────────────────────────────────── */
-    @keyframes confetti-fall { to{transform:translateY(105vh) rotate(720deg);opacity:0} }
-    .confetti-dot { position:fixed; pointer-events:none; z-index:9999; animation:confetti-fall 1.4s ease-in forwards; }
-
-    /* ── Toast ──────────────────────────────────────────────── */
-    @keyframes toast-up { from{transform:translate(-50%,40px);opacity:0} to{transform:translate(-50%,0);opacity:1} }
-    .level-toast {
-      position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
-      background:linear-gradient(135deg,#7c3aed,#a855f7);
-      color:white; padding:12px 28px; border-radius:50px;
-      font-weight:800; font-size:1rem; z-index:9998;
-      animation:toast-up 0.35s ease;
-      box-shadow:0 8px 30px rgba(124,58,237,0.5);
-      white-space:nowrap;
+    .fb-correct {
+      background: #dcfce7; border: 2px solid #16a34a; color: #14532d;
+      border-radius: 16px; padding: 14px 16px;
+      font-weight: 700; font-size: .88rem; line-height: 1.5;
+    }
+    .fb-incorrect {
+      background: #fee2e2; border: 2px solid #dc2626; color: #7f1d1d;
+      border-radius: 16px; padding: 14px 16px;
+      font-weight: 700; font-size: .88rem; line-height: 1.5;
     }
 
-    /* ── Scrollbar ──────────────────────────────────────────── */
-    ::-webkit-scrollbar { width:4px; }
-    ::-webkit-scrollbar-track { background:transparent; }
-    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:99px; }
+    /* ── Leçon (dans la carte blanche) ─────────────────────── */
+    .lesson-content h3     { font-size: 1.05rem; font-weight: 800; color: #6d28d9; margin-bottom: 10px; }
+    .lesson-content p      { margin-bottom: 8px; font-size: .88rem; line-height: 1.55; color: #1a0a4e; }
+    .lesson-content ul     { list-style: none; padding: 0; margin: 0 0 8px; }
+    .lesson-content li     { padding-left: 4px; margin-bottom: 5px; font-size: .86rem; color: #1a0a4e; }
+    .lesson-content strong { color: #7c3aed; }
+    .lesson-content em     { color: #6b7280; font-style: italic; }
+    .lesson-content table  { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: .83rem; }
+    .lesson-content td,
+    .lesson-content th     { padding: 5px 8px; color: #1a0a4e; }
+    .lesson-content u      { text-decoration-color: #a855f7; }
+    .lesson-content br     { display: block; margin: 4px 0; content: ''; }
+
+    /* ── Verre (cartes niveau) ──────────────────────────────── */
+    .glass-card {
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 20px;
+    }
+
+    /* ── Confettis & Toast ──────────────────────────────────── */
+    @keyframes confetti-fall { to { transform: translateY(105vh) rotate(720deg); opacity:0; } }
+    .confetti-dot { position:fixed; pointer-events:none; z-index:9999; animation: confetti-fall 1.4s ease-in forwards; }
+
+    @keyframes toast-up { from{transform:translate(-50%,40px);opacity:0} to{transform:translate(-50%,0);opacity:1} }
+    .level-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white; padding: 12px 28px; border-radius: 50px;
+      font-weight: 800; font-size: 1rem; z-index: 9998;
+      animation: toast-up .35s ease;
+      box-shadow: 0 8px 30px rgba(124,58,237,.5);
+      white-space: nowrap;
+    }
+
+    /* ── Timer circle ───────────────────────────────────────── */
+    @keyframes timer-shrink { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 88; } }
+    .timer-svg circle { animation: timer-shrink 15s linear forwards; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- Dépendances avant React -->
   <script src="js/teacher.js"></script>
   <script src="js/profiles.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/data-extra.js"></script>
 
-  <!-- React 18 CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -146,22 +175,19 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // ═══════════════════════════════════════════════════════════
-    // Utilitaires
-    // ═══════════════════════════════════════════════════════════
-    const CONFETTI_COLORS = ['#a855f7','#3b82f6','#ec4899','#10b981','#f97316','#fbbf24'];
+    const CONFETTI = ['#a855f7','#3b82f6','#ec4899','#10b981','#f97316','#fbbf24','#ef4444'];
 
-    function fireworks(n = 50) {
-      for (let i = 0; i < n; i++) {
+    function fireworks(n=55) {
+      for (let i=0;i<n;i++) {
         const el = document.createElement('div');
         el.className = 'confetti-dot';
-        const size = Math.random() * 8 + 4;
-        el.style.cssText = `left:${Math.random()*100}vw;top:-10px;width:${size}px;height:${size}px;`
-          + `background:${CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]};`
-          + `border-radius:${Math.random()>0.5?'50%':'2px'};`
-          + `animation-delay:${Math.random()*0.6}s;animation-duration:${Math.random()*0.5+1.1}s;`;
+        const s = Math.random()*9+4;
+        el.style.cssText = `left:${Math.random()*100}vw;top:-10px;width:${s}px;height:${s}px;`
+          +`background:${CONFETTI[Math.floor(Math.random()*CONFETTI.length)]};`
+          +`border-radius:${Math.random()>.5?'50%':'3px'};`
+          +`animation-delay:${Math.random()*.7}s;animation-duration:${Math.random()*.5+1.1}s;`;
         document.body.appendChild(el);
-        setTimeout(() => el.remove(), 2000);
+        setTimeout(()=>el.remove(), 2200);
       }
     }
 
@@ -172,74 +198,51 @@
       setTimeout(() => { el.textContent = text; el.style.opacity = '1'; }, 180);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // HUD — barre du haut
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // HUD
+    // ══════════════════════════════════════════════════════════
     function HUD({ onBack, title, onSwitch }) {
-      const [hud, setHud] = useState({ xp:0, level:1, hearts:5, streak:0, pct:0, name:'' });
+      const [h, setH] = useState({ xp:0, level:1, hearts:5, streak:0, pct:0, name:'' });
 
       function refresh() {
-        const d = Profiles.getData();
-        if (!d) return;
+        const d = Profiles.getData(); if (!d) return;
         const lxp = Profiles.getLevelXP();
-        setHud({
-          xp:     d.xp,
-          level:  Profiles.getLevel(),
-          hearts: Math.max(0, d.hearts ?? 5),
-          streak: d.streak || 0,
-          pct:    Math.round((lxp.current / lxp.needed) * 100),
-          name:   Profiles.getCurrent() || ''
-        });
+        setH({ xp:d.xp, level:Profiles.getLevel(), hearts:Math.max(0,d.hearts??5),
+               streak:d.streak||0, pct:Math.round(lxp.current/lxp.needed*100),
+               name:Profiles.getCurrent()||'' });
       }
-
-      useEffect(() => {
-        refresh();
-        window._refreshHUD = refresh;
-        return () => { window._refreshHUD = null; };
-      }, []);
+      useEffect(() => { refresh(); window._refreshHUD = refresh; return ()=>{ window._refreshHUD=null; }; }, []);
 
       return (
         <header className="hud">
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'4px'}}>
             <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-              {onBack && (
-                <button onClick={onBack}
-                  style={{fontSize:'1.2rem',background:'none',border:'none',color:'white',cursor:'pointer',padding:'0 4px'}}>
-                  ←
-                </button>
-              )}
-              <span style={{fontWeight:800,fontSize:'0.9rem',maxWidth:'180px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                {title}
-              </span>
+              {onBack && <button onClick={onBack} style={{background:'none',border:'none',color:'white',cursor:'pointer',fontSize:'1.2rem',padding:'0 2px'}}>←</button>}
+              <span style={{fontWeight:800,fontSize:'0.88rem',maxWidth:'180px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{title}</span>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
-              <span className="glass-chip">🔥 {hud.streak}</span>
-              <span className="glass-chip">⭐ {hud.xp}</span>
-              <span style={{fontSize:'0.9rem',letterSpacing:'-2px'}}>
-                {Array.from({length:5},(_,i) => (
-                  <span key={i} className={i < hud.hearts ? '' : 'heart-empty'}>❤️</span>
-                ))}
+            <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
+              <span className="glass-chip">🔥 {h.streak}</span>
+              <span className="glass-chip">⭐ {h.xp}</span>
+              <span style={{fontSize:'0.85rem',letterSpacing:'-2px'}}>
+                {Array.from({length:5},(_,i)=><span key={i} className={i<h.hearts?'':'heart-empty'}>❤️</span>)}
               </span>
-              <button onClick={onSwitch}
-                style={{background:'none',border:'none',color:'white',cursor:'pointer',fontSize:'1.1rem',marginLeft:'2px'}}>
-                🔄
-              </button>
+              <button onClick={onSwitch} style={{background:'none',border:'none',color:'white',cursor:'pointer',fontSize:'1.1rem',marginLeft:'2px'}}>🔄</button>
             </div>
           </div>
-          <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.72rem',color:'rgba(255,255,255,0.45)',marginBottom:'6px'}}>
-            <span style={{fontWeight:700,color:'rgba(255,255,255,0.65)'}}>{hud.name}</span>
-            <span>Niveau {hud.level} · {hud.pct}%</span>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.7rem',color:'rgba(255,255,255,.45)',marginBottom:'5px'}}>
+            <span style={{fontWeight:700,color:'rgba(255,255,255,.7)'}}>{h.name}</span>
+            <span>Niveau {h.level} · {h.pct}%</span>
           </div>
           <div className="progress-track" style={{height:'6px'}}>
-            <div className="progress-fill" style={{width:hud.pct+'%',background:'linear-gradient(90deg,#a855f7,#3b82f6)'}}></div>
+            <div className="progress-fill" style={{width:h.pct+'%',background:'linear-gradient(90deg,#a855f7,#60a5fa)'}}></div>
           </div>
         </header>
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     // Zone Professeure
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     function TeacherZone({ initMsg }) {
       function activerMicro() {
         if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
@@ -248,126 +251,105 @@
         });
       }
       return (
-        <div style={{display:'flex',alignItems:'flex-start',gap:'12px',padding:'12px 16px'}}>
+        <div style={{display:'flex',alignItems:'flex-start',gap:'14px',padding:'14px 16px 8px'}}>
           <div id="teacher-avatar" className="avatar-idle">
             <div className="t-ring-wrap">
               <div className="t-ring"></div>
               <div className="t-inner"><span className="t-emoji">👩‍🏫</span></div>
             </div>
           </div>
-          <div style={{flex:1,paddingTop:'4px',position:'relative'}}>
-            <div id="teacher-bubble" className="speech-bubble">{initMsg || 'Bonjour !'}</div>
-            <div style={{fontSize:'0.68rem',color:'rgba(255,255,255,0.3)',marginTop:'4px',marginLeft:'4px'}}>
-              Mme Sophie ✨
-            </div>
+          <div style={{flex:1,paddingTop:'6px',position:'relative'}}>
+            <div id="teacher-bubble" className="speech-bubble">{initMsg||'Bonjour !'}</div>
+            <div style={{fontSize:'0.67rem',color:'rgba(255,255,255,.3)',marginTop:'4px',marginLeft:'4px'}}>Mme Sophie ✨</div>
           </div>
           <button onClick={activerMicro}
-            style={{flexShrink:0,marginTop:'4px',width:'36px',height:'36px',borderRadius:'50%',border:'1px solid rgba(168,85,247,0.5)',
-              background:'rgba(168,85,247,0.2)',color:'white',cursor:'pointer',fontSize:'1rem',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            style={{flexShrink:0,marginTop:'6px',width:'38px',height:'38px',borderRadius:'50%',
+              border:'1.5px solid rgba(248,113,183,.5)',background:'rgba(248,113,183,.15)',
+              color:'white',cursor:'pointer',fontSize:'1rem',display:'flex',alignItems:'center',justifyContent:'center'}}>
             🎤
           </button>
         </div>
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     // Modal Profil
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
     function ProfileModal({ onSelect }) {
-      const allObj   = Profiles.getAll();
-      const names    = Object.keys(allObj);
-      const EMOJIS   = ['🧒','👦','👧','🌟','🎓','🦁','🐻','🦊','🐼','🐧'];
-      const [newName, setNewName]   = useState('');
-      const [creating, setCreating] = useState(names.length === 0);
-      const [error, setError]       = useState('');
+      const allObj = Profiles.getAll();
+      const names  = Object.keys(allObj);
+      const EMOJIS = ['🧒','👦','👧','🌟','🎓','🦁','🐻','🦊','🐼','🐧'];
+      const [newName,  setNewName]  = useState('');
+      const [creating, setCreating] = useState(names.length===0);
+      const [error,    setError]    = useState('');
 
       function handleCreate() {
         const name = newName.trim();
         if (name.length < 2) { setError('Prénom trop court !'); return; }
         if (allObj[name]) { setError('Ce prénom existe déjà !'); return; }
-        Profiles.create(name);
-        Profiles.updateStreak();
-        onSelect(name);
+        Profiles.create(name); Profiles.updateStreak(); onSelect(name);
       }
-
-      function handleSelect(name) {
-        Profiles.setCurrent(name);
-        Profiles.updateStreak();
-        onSelect(name);
-      }
+      function handleSelect(n) { Profiles.setCurrent(n); Profiles.updateStreak(); onSelect(n); }
 
       return (
         <div style={{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',
-          padding:'16px',background:'linear-gradient(135deg,#0f0c29,#302b63,#24243e)'}}>
+          padding:'20px',background:'linear-gradient(160deg,#1a0a4e,#2d1060,#0d1a5c)'}}>
           <div style={{width:'100%',maxWidth:'360px'}}>
-            {/* Logo */}
-            <div style={{textAlign:'center',marginBottom:'24px'}}>
+            <div style={{textAlign:'center',marginBottom:'28px'}}>
               <div style={{fontSize:'3.5rem',marginBottom:'4px'}}>✨</div>
-              <h1 style={{fontSize:'1.7rem',fontWeight:900}}>L'école magique</h1>
-              <p style={{color:'rgba(255,255,255,0.4)',fontSize:'0.85rem',marginTop:'4px'}}>avec Mme Sophie 👩‍🏫</p>
+              <h1 style={{fontSize:'1.8rem',fontWeight:900,letterSpacing:'-0.5px'}}>L'école magique</h1>
+              <p style={{color:'rgba(255,255,255,.4)',fontSize:'0.85rem',marginTop:'4px'}}>avec Mme Sophie 👩‍🏫</p>
             </div>
+            <div className="glass-card" style={{padding:'22px'}}>
+              <h2 style={{fontWeight:900,fontSize:'1.1rem',marginBottom:'18px',textAlign:'center'}}>Qui es-tu ?</h2>
 
-            <div className="glass-card" style={{padding:'20px'}}>
-              <h2 style={{fontWeight:900,fontSize:'1.1rem',marginBottom:'16px',textAlign:'center'}}>
-                Qui es-tu aujourd'hui ?
-              </h2>
-
-              {/* Profiles existants */}
-              {names.length > 0 && !creating && (
-                <div style={{display:'flex',flexDirection:'column',gap:'8px',marginBottom:'12px'}}>
-                  {names.map(n => {
-                    const d   = allObj[n];
-                    const lvl = Math.floor((d.xp||0)/100)+1;
-                    const ei  = n.charCodeAt(0) % EMOJIS.length;
-                    return (
-                      <button key={n} onClick={() => handleSelect(n)}
+              {names.length>0 && !creating && (
+                <div style={{display:'flex',flexDirection:'column',gap:'8px',marginBottom:'14px'}}>
+                  {names.map(n=>{
+                    const d=allObj[n], lvl=Math.floor((d.xp||0)/100)+1;
+                    const ei=n.charCodeAt(0)%EMOJIS.length;
+                    return(
+                      <button key={n} onClick={()=>handleSelect(n)}
                         style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px',borderRadius:'16px',
-                          background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',
-                          color:'white',cursor:'pointer',width:'100%',textAlign:'left',transition:'transform 0.15s'}}
+                          background:'rgba(255,255,255,.09)',border:'1px solid rgba(255,255,255,.16)',
+                          color:'white',cursor:'pointer',width:'100%',textAlign:'left',transition:'transform .15s',fontFamily:'Poppins,sans-serif'}}
                         onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'}
                         onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
-                        <span style={{fontSize:'1.8rem'}}>{EMOJIS[ei]}</span>
+                        <span style={{fontSize:'2rem'}}>{EMOJIS[ei]}</span>
                         <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontWeight:800,fontSize:'1rem',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n}</div>
-                          <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)'}}>
-                            Niveau {lvl} · {d.xp||0} XP · {d.hearts??5}❤️ · 🔥{d.streak||0}
-                          </div>
+                          <div style={{fontWeight:800,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n}</div>
+                          <div style={{fontSize:'.72rem',color:'rgba(255,255,255,.4)'}}>Niveau {lvl} · {d.xp||0} XP · {d.hearts??5}❤️ · 🔥{d.streak||0}</div>
                         </div>
-                        <span style={{color:'rgba(255,255,255,0.3)',fontSize:'1.3rem'}}>→</span>
+                        <span style={{color:'rgba(255,255,255,.3)',fontSize:'1.3rem'}}>→</span>
                       </button>
                     );
                   })}
                 </div>
               )}
 
-              {/* Créer profil */}
               {creating ? (
                 <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
                   <input autoFocus type="text" value={newName} maxLength={20}
-                    onChange={e => { setNewName(e.target.value); setError(''); }}
-                    onKeyDown={e => e.key === 'Enter' && handleCreate()}
+                    onChange={e=>{setNewName(e.target.value);setError('');}}
+                    onKeyDown={e=>e.key==='Enter'&&handleCreate()}
                     placeholder="Ton prénom..."
-                    style={{padding:'12px 16px',borderRadius:'14px',fontSize:'1rem',fontWeight:700,
-                      background:'rgba(255,255,255,0.08)',border:'2px solid rgba(255,255,255,0.2)',
+                    style={{padding:'13px 16px',borderRadius:'14px',fontSize:'1rem',fontWeight:700,
+                      background:'rgba(255,255,255,.1)',border:'2px solid rgba(255,255,255,.2)',
                       color:'white',outline:'none',fontFamily:'Poppins,sans-serif'}}
                   />
-                  {error && <p style={{color:'#f87171',fontSize:'0.8rem',textAlign:'center'}}>{error}</p>}
+                  {error && <p style={{color:'#f87171',fontSize:'.8rem',textAlign:'center'}}>{error}</p>}
                   <button onClick={handleCreate}
                     style={{padding:'14px',borderRadius:'16px',fontWeight:900,fontSize:'1rem',color:'white',
-                      border:'none',cursor:'pointer',background:'linear-gradient(135deg,#7c3aed,#a855f7)',fontFamily:'Poppins,sans-serif'}}>
+                      border:'none',cursor:'pointer',background:'linear-gradient(135deg,#7c3aed,#ec4899)',fontFamily:'Poppins,sans-serif',
+                      boxShadow:'0 6px 20px rgba(124,58,237,.4)'}}>
                     C'est parti ! 🚀
                   </button>
-                  {names.length > 0 && (
-                    <button onClick={() => setCreating(false)}
-                      style={{background:'none',border:'none',color:'rgba(255,255,255,0.35)',cursor:'pointer',fontSize:'0.85rem',fontFamily:'Poppins,sans-serif'}}>
-                      ← Retour
-                    </button>
-                  )}
+                  {names.length>0&&<button onClick={()=>setCreating(false)} style={{background:'none',border:'none',color:'rgba(255,255,255,.35)',cursor:'pointer',fontSize:'.85rem',fontFamily:'Poppins,sans-serif'}}>← Retour</button>}
                 </div>
               ) : (
-                <button onClick={() => setCreating(true)}
+                <button onClick={()=>setCreating(true)}
                   style={{width:'100%',padding:'12px',borderRadius:'16px',fontWeight:700,color:'white',
-                    border:'1px solid rgba(168,85,247,0.5)',background:'rgba(168,85,247,0.2)',cursor:'pointer',fontFamily:'Poppins,sans-serif'}}>
+                    border:'1px solid rgba(168,85,247,.5)',background:'rgba(168,85,247,.2)',cursor:'pointer',fontFamily:'Poppins,sans-serif'}}>
                   ➕ Nouveau profil
                 </button>
               )}
@@ -377,51 +359,48 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Écran d'accueil — choix du niveau
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // Accueil — choix du niveau
+    // ══════════════════════════════════════════════════════════
     function HomeScreen({ user, onSelectLevel }) {
       useEffect(() => {
         const m = `Bonjour ${user} ! Choisis ton niveau pour commencer !`;
         setTeacherMsg(m);
-        setTimeout(() => Teacher.encourager(m), 400);
+        setTimeout(()=>Teacher.encourager(m), 400);
       }, []);
 
       return (
         <div>
           <TeacherZone initMsg={`Bonjour ${user} ! Quel est ton niveau ?`} />
           <div style={{padding:'0 16px 32px'}}>
-            <p style={{textAlign:'center',fontSize:'0.72rem',fontWeight:700,color:'rgba(255,255,255,0.35)',
-              textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'14px'}}>
-              Choisis ton niveau
-            </p>
+            <p style={{textAlign:'center',fontSize:'.7rem',fontWeight:700,color:'rgba(255,255,255,.35)',textTransform:'uppercase',letterSpacing:'.1em',marginBottom:'14px'}}>Choisis ton niveau</p>
             <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
-              {Object.values(NIVEAUX).map(niv => {
-                const prog    = Profiles.getData()?.progression || {};
-                const total   = niv.matieres.francais.themes.length;
-                const done    = Object.keys(prog).filter(k => k.startsWith(niv.id + '_')).length;
-                const pct     = total > 0 ? Math.round(done/total*100) : 0;
-                return (
-                  <button key={niv.id} onClick={() => onSelectLevel(niv.id)}
+              {Object.values(NIVEAUX).map(niv=>{
+                const prog  = Profiles.getData()?.progression||{};
+                const total = niv.matieres.francais.themes.length;
+                const done  = Object.keys(prog).filter(k=>k.startsWith(niv.id+'_')).length;
+                const pct   = total>0?Math.round(done/total*100):0;
+                return(
+                  <button key={niv.id} onClick={()=>onSelectLevel(niv.id)}
                     style={{display:'flex',alignItems:'center',gap:'14px',padding:'14px 16px',
-                      borderRadius:'20px',color:'white',cursor:'pointer',width:'100%',textAlign:'left',
-                      background:`linear-gradient(135deg,${niv.couleur}28,${niv.couleurDark}48)`,
-                      border:`2px solid ${niv.couleur}44`,transition:'transform 0.15s',fontFamily:'Poppins,sans-serif'}}
+                      borderRadius:'22px',color:'white',cursor:'pointer',width:'100%',textAlign:'left',
+                      background:`linear-gradient(135deg,${niv.couleur}35,${niv.couleurDark}55)`,
+                      border:`2px solid ${niv.couleur}55`,transition:'transform .15s',fontFamily:'Poppins,sans-serif'}}
                     onMouseEnter={e=>e.currentTarget.style.transform='scale(1.02)'}
                     onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
-                    <span style={{fontSize:'2.8rem',lineHeight:1}}>{niv.emoji}</span>
+                    <span style={{fontSize:'3rem',lineHeight:1}}>{niv.emoji}</span>
                     <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontWeight:900,fontSize:'1.05rem'}}>{niv.nom}</div>
-                      <div style={{fontSize:'0.78rem',color:'rgba(255,255,255,0.5)',marginBottom:'6px'}}>{niv.description}</div>
-                      {done > 0 && (
-                        <div className="progress-track" style={{height:'5px',width:'80px'}}>
+                      <div style={{fontWeight:900,fontSize:'1.1rem'}}>{niv.nom}</div>
+                      <div style={{fontSize:'.78rem',color:'rgba(255,255,255,.5)',marginBottom:'6px'}}>{niv.description}</div>
+                      {done>0&&(
+                        <div className="progress-track" style={{height:'5px',width:'90px'}}>
                           <div className="progress-fill" style={{width:pct+'%',background:niv.couleur,height:'5px'}}></div>
                         </div>
                       )}
                     </div>
                     <div style={{textAlign:'right',flexShrink:0}}>
-                      {done > 0 && <div style={{fontSize:'0.7rem',color:'rgba(255,255,255,0.35)',marginBottom:'2px'}}>{done}/{total}</div>}
-                      <span style={{fontSize:'1.4rem',color:niv.couleur}}>→</span>
+                      {done>0&&<div style={{fontSize:'.7rem',color:'rgba(255,255,255,.35)',marginBottom:'2px'}}>{done}/{total}</div>}
+                      <span style={{fontSize:'1.5rem',color:niv.couleur}}>→</span>
                     </div>
                   </button>
                 );
@@ -432,77 +411,58 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Écran Thèmes
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // Thèmes
+    // ══════════════════════════════════════════════════════════
     function ThemesScreen({ levelId, onSelectTopic }) {
       const niv    = NIVEAUX[levelId];
       const themes = niv.matieres.francais.themes;
-      const total  = themes.reduce((a,t) => a + t.exercices.length, 0);
 
       useEffect(() => {
         const m = `Voici les thèmes du ${niv.nom}. Par où veux-tu commencer ?`;
         setTeacherMsg(m);
-        setTimeout(() => Teacher.poserQuestion(m), 400);
+        setTimeout(()=>Teacher.poserQuestion(m), 400);
       }, []);
 
       return (
         <div>
           <TeacherZone initMsg={`Thèmes du ${niv.nom} !`} />
           <div style={{padding:'0 16px 32px'}}>
-            {/* En-tête niveau */}
-            <div style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px 14px',
-              borderRadius:'16px',marginBottom:'14px',background:`${niv.couleur}18`,border:`1px solid ${niv.couleur}30`}}>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px 14px',borderRadius:'16px',marginBottom:'14px',background:`${niv.couleur}22`,border:`1px solid ${niv.couleur}33`}}>
               <span style={{fontSize:'2rem'}}>{niv.emoji}</span>
               <div>
                 <div style={{fontWeight:900}}>{niv.nom} — Français 📖</div>
-                <div style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.45)'}}>
-                  {themes.length} thèmes · {total} exercices
+                <div style={{fontSize:'.74rem',color:'rgba(255,255,255,.45)'}}>
+                  {themes.length} thèmes · {themes.reduce((a,t)=>a+t.exercices.length,0)} exercices
                 </div>
               </div>
             </div>
-
             <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
-              {themes.map((theme, idx) => {
-                const prog     = Profiles.getData()?.progression || {};
-                const key      = `${levelId}_${theme.id}`;
-                const done     = prog[key]?.done || 0;
-                const nbEx     = theme.exercices.length;
-                const pct      = nbEx > 0 ? Math.round(done/nbEx*100) : 0;
-                const complete = done >= nbEx && nbEx > 0;
-                return (
-                  <button key={theme.id} onClick={() => onSelectTopic(idx)}
+              {themes.map((theme,idx)=>{
+                const prog  = Profiles.getData()?.progression||{};
+                const key   = `${levelId}_${theme.id}`;
+                const done  = prog[key]?.done||0;
+                const nbEx  = theme.exercices.length;
+                const pct   = nbEx>0?Math.round(done/nbEx*100):0;
+                const ok    = done>=nbEx&&nbEx>0;
+                return(
+                  <button key={theme.id} onClick={()=>onSelectTopic(idx)}
                     className="glass-card"
-                    style={{display:'block',width:'100%',padding:'14px',cursor:'pointer',
-                      textAlign:'left',color:'white',transition:'transform 0.15s',fontFamily:'Poppins,sans-serif'}}
+                    style={{display:'block',width:'100%',padding:'14px',cursor:'pointer',textAlign:'left',color:'white',transition:'transform .15s',fontFamily:'Poppins,sans-serif'}}
                     onMouseEnter={e=>e.currentTarget.style.transform='scale(1.01)'}
                     onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
                     <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:nbEx>0?'8px':'0'}}>
-                      <div style={{width:'48px',height:'48px',borderRadius:'14px',display:'flex',alignItems:'center',
-                        justifyContent:'center',fontSize:'1.6rem',flexShrink:0,background:`${niv.couleur}20`}}>
-                        {theme.emoji}
-                      </div>
+                      <div style={{width:'50px',height:'50px',borderRadius:'14px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.7rem',flexShrink:0,background:`${niv.couleur}25`}}>{theme.emoji}</div>
                       <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontWeight:700,fontSize:'0.92rem',marginBottom:'2px'}}>{theme.nom}</div>
-                        <div style={{fontSize:'0.72rem',color:'rgba(255,255,255,0.4)'}}>
-                          {nbEx} exercice{nbEx>1?'s':''}
-                        </div>
+                        <div style={{fontWeight:700,fontSize:'.92rem',marginBottom:'2px'}}>{theme.nom}</div>
+                        <div style={{fontSize:'.72rem',color:'rgba(255,255,255,.4)'}}>{nbEx} exercice{nbEx>1?'s':''}</div>
                       </div>
                       <div style={{flexShrink:0,textAlign:'right'}}>
-                        {complete
-                          ? <span style={{fontSize:'1.2rem'}}>✅</span>
-                          : <span style={{color:'rgba(255,255,255,0.25)',fontSize:'1.2rem'}}>→</span>
-                        }
-                        {!complete && done > 0 && (
-                          <div style={{fontSize:'0.68rem',color:'rgba(255,255,255,0.3)'}}>{pct}%</div>
-                        )}
+                        {ok?<span style={{fontSize:'1.2rem'}}>✅</span>:<span style={{color:'rgba(255,255,255,.25)',fontSize:'1.2rem'}}>→</span>}
+                        {!ok&&done>0&&<div style={{fontSize:'.68rem',color:'rgba(255,255,255,.3)'}}>{pct}%</div>}
                       </div>
                     </div>
-                    {nbEx > 0 && (
-                      <div className="progress-track" style={{height:'4px'}}>
-                        <div className="progress-fill" style={{width:pct+'%',background:niv.couleur,height:'4px'}}></div>
-                      </div>
-                    )}
+                    {nbEx>0&&(<div className="progress-track" style={{height:'4px'}}><div className="progress-fill" style={{width:pct+'%',background:niv.couleur,height:'4px'}}></div></div>)}
                   </button>
                 );
               })}
@@ -512,39 +472,37 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Écran Leçon
-    // ═══════════════════════════════════════════════════════════
-    function LessonScreen({ levelId, topicIdx, onStartExercises }) {
+    // ══════════════════════════════════════════════════════════
+    // Leçon
+    // ══════════════════════════════════════════════════════════
+    function LessonScreen({ levelId, topicIdx, onStart }) {
       const niv   = NIVEAUX[levelId];
       const theme = niv.matieres.francais.themes[topicIdx];
+      const name  = Profiles.getCurrent()||'';
 
       useEffect(() => {
-        const m = "Lis bien la leçon ! Quand tu es prêt, clique sur Commencer.";
-        setTeacherMsg(m);
-        setTimeout(() => Teacher.expliquer(m), 400);
+        setTimeout(()=>Teacher.accueillir(name, theme.nom), 400);
       }, []);
 
       return (
         <div>
-          <TeacherZone initMsg="Lis bien la leçon !" />
+          <TeacherZone initMsg={`Lis bien la leçon sur ${theme.nom} !`} />
           <div style={{padding:'0 16px 32px'}}>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'14px'}}>
               <span style={{fontSize:'1.8rem'}}>{theme.emoji}</span>
-              <h2 style={{fontWeight:900,fontSize:'1.05rem'}}>{theme.nom}</h2>
+              <h2 style={{fontWeight:900,fontSize:'1.05rem',color:'white'}}>{theme.nom}</h2>
             </div>
-            <div className="glass-card" style={{padding:'18px 16px',marginBottom:'16px'}}>
-              <div className="lesson-content"
-                dangerouslySetInnerHTML={{__html: theme.lecon}} />
+            <div className="ex-card" style={{marginBottom:'16px'}}>
+              <div className="lesson-content" dangerouslySetInnerHTML={{__html:theme.lecon}} />
             </div>
-            <div style={{textAlign:'center',fontSize:'0.8rem',color:'rgba(255,255,255,0.35)',marginBottom:'12px'}}>
+            <div style={{textAlign:'center',fontSize:'.8rem',color:'rgba(255,255,255,.35)',marginBottom:'12px'}}>
               {theme.exercices.length} exercice{theme.exercices.length>1?'s':''} t'attendent !
             </div>
-            <button onClick={onStartExercises}
-              style={{width:'100%',padding:'16px',borderRadius:'18px',fontWeight:900,fontSize:'1.05rem',
+            <button onClick={onStart}
+              style={{width:'100%',padding:'16px',borderRadius:'20px',fontWeight:900,fontSize:'1.05rem',
                 color:'white',border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif',
                 background:`linear-gradient(135deg,${niv.couleur},${niv.couleurDark})`,
-                boxShadow:`0 8px 24px ${niv.couleur}44`,transition:'transform 0.15s'}}
+                boxShadow:`0 8px 28px ${niv.couleur}55`,transition:'transform .15s'}}
               onMouseEnter={e=>e.currentTarget.style.transform='scale(1.03)'}
               onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
               Commencer les exercices 🚀
@@ -554,55 +512,66 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Écran Exercices
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // Exercices — avec professeure réactive
+    // ══════════════════════════════════════════════════════════
     function ExerciseScreen({ levelId, topicIdx, onComplete }) {
-      const niv      = NIVEAUX[levelId];
-      const theme    = niv.matieres.francais.themes[topicIdx];
+      const niv       = NIVEAUX[levelId];
+      const theme     = niv.matieres.francais.themes[topicIdx];
       const exercices = theme.exercices;
+      const name      = Profiles.getCurrent()||'';
 
-      const [exIdx, setExIdx]   = useState(0);
-      const [selected, setSel]  = useState(null);
-      const [answered, setAns]  = useState(false);
-      const [isOk, setIsOk]     = useState(null);
-      const [toast, setToast]   = useState('');
-      const nbOk = useRef(0);
+      const [exIdx,    setExIdx]  = useState(0);
+      const [selected, setSel]    = useState(null);
+      const [answered, setAns]    = useState(false);
+      const [isOk,     setIsOk]   = useState(null);
+      const [toast,    setToast]  = useState('');
+      const [timerKey, setTimerKey] = useState(0);
+
+      const nbOk     = useRef(0);
+      const consOk   = useRef(0);  // bonnes réponses consécutives
+      const consWrong= useRef(0);  // erreurs consécutives
+      const delayRef = useRef(null);
 
       const ex = exercices[exIdx];
 
       useEffect(() => {
         if (!ex) return;
-        const affiche = ex.rappel ? "💡 " + ex.rappel : "Choisis la bonne réponse !";
-        const parle   = ex.rappel || "Choisis la bonne réponse !";
-        setTeacherMsg(affiche);
-        Teacher.poserQuestion(parle); // sans emoji → pas de "sire ampoule"
+        const rappel = ex.rappel || '';
+        // Effacer le timer précédent
+        if (delayRef.current) clearTimeout(delayRef.current);
+        // Introduire l'exercice
+        Teacher.introduire(name, exIdx+1, exercices.length, rappel);
+        setTimerKey(k=>k+1);
+        // Timer 18s : encouragement si pas de réponse
+        delayRef.current = setTimeout(()=>{
+          if (document.visibilityState !== 'hidden') Teacher.encouragerDelai(name);
+        }, 18000);
+        return () => clearTimeout(delayRef.current);
       }, [exIdx]);
 
-      function showToast(t) {
-        setToast(t);
-        setTimeout(() => setToast(''), 3200);
-      }
+      function showToast(t) { setToast(t); setTimeout(()=>setToast(''), 3200); }
 
       function handleAnswer(choice) {
         if (answered) return;
-        setSel(choice);
-        setAns(true);
+        clearTimeout(delayRef.current);
+        setSel(choice); setAns(true);
         const ok = choice === ex.bonne;
         setIsOk(ok);
 
         if (ok) {
           nbOk.current += 1;
-          setTeacherMsg(ex.expl_bravo);
-          Teacher.encourager(ex.expl_bravo);
-          SFX.correct();
-          fireworks();
+          consOk.current += 1;
+          consWrong.current = 0;
+          Teacher.reagirCorrect(name, consOk.current, ex.expl_bravo);
+          SFX.correct(); fireworks();
           const lu = Profiles.addXP(10);
           window._refreshHUD?.();
-          if (lu) { SFX.levelUp(); showToast("🎉 Niveau " + Profiles.getLevel() + " atteint !"); }
+          if (lu) { SFX.levelUp(); showToast('🎉 Niveau '+Profiles.getLevel()+' atteint !'); }
         } else {
-          setTeacherMsg("❌ " + ex.expl_erreur);
-          Teacher.consoler(ex.expl_erreur);
+          consWrong.current += 1;
+          consOk.current = 0;
+          Teacher.reagirErreur(name, consWrong.current, ex.expl_erreur);
           SFX.incorrect();
           Profiles.loseHeart();
           window._refreshHUD?.();
@@ -610,60 +579,54 @@
       }
 
       function handleNext() {
-        if (exIdx + 1 >= exercices.length) {
-          const key = `${levelId}_${theme.id}`;
-          Profiles.saveProgression(key, { done: exercices.length, date: new Date().toLocaleDateString('fr-FR') });
-          onComplete({ correct: nbOk.current, total: exercices.length });
+        if (exIdx+1 >= exercices.length) {
+          Profiles.saveProgression(`${levelId}_${theme.id}`, { done:exercices.length, date:new Date().toLocaleDateString('fr-FR') });
+          Teacher.celebrerFin(name, nbOk.current, exercices.length);
+          onComplete({ correct:nbOk.current, total:exercices.length });
         } else {
-          setExIdx(i => i+1);
-          setSel(null);
-          setAns(false);
-          setIsOk(null);
+          setExIdx(i=>i+1);
+          setSel(null); setAns(false); setIsOk(null);
         }
       }
 
       if (!ex) return null;
-      const pct = Math.round(((exIdx+1)/exercices.length)*100);
-      const LETTERS = ['A','B','C','D'];
+      const pct   = Math.round((exIdx+1)/exercices.length*100);
+      const ALPHA = ['A','B','C','D'];
 
       return (
         <div>
-          <TeacherZone initMsg={ex.rappel ? "💡 " + ex.rappel : "Choisis la bonne réponse !"} />
+          <TeacherZone initMsg={ex.rappel||'Choisis la bonne réponse !'} />
           <div style={{padding:'0 16px 32px'}}>
-            {/* Progression */}
+            {/* Barre de progression */}
             <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
-              <span style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)',flexShrink:0}}>
-                {exIdx+1}/{exercices.length}
-              </span>
-              <div className="progress-track" style={{flex:1,height:'6px'}}>
-                <div className="progress-fill" style={{width:pct+'%',background:niv.couleur,height:'6px'}}></div>
+              <span style={{fontSize:'.73rem',color:'rgba(255,255,255,.4)',flexShrink:0}}>{exIdx+1}/{exercices.length}</span>
+              <div className="progress-track" style={{flex:1,height:'7px'}}>
+                <div className="progress-fill" style={{width:pct+'%',background:`linear-gradient(90deg,${niv.couleur},${niv.couleurDark})`,height:'7px'}}></div>
               </div>
-              <span style={{fontSize:'0.75rem',color:'rgba(255,255,255,0.4)',flexShrink:0}}>
-                {nbOk.current}✅
-              </span>
+              <span style={{fontSize:'.73rem',color:'rgba(255,255,255,.4)',flexShrink:0}}>{nbOk.current}✅</span>
             </div>
 
             {/* Question */}
-            <div className="glass-card" style={{padding:'16px',marginBottom:'14px'}}>
-              <p style={{fontWeight:700,fontSize:'0.95rem',lineHeight:1.5,color:'rgba(255,255,255,0.92)'}}>
-                {ex.question}
-              </p>
+            <div className="ex-card" style={{marginBottom:'14px'}}>
+              <p style={{fontWeight:800,fontSize:'1rem',lineHeight:1.5,color:'#1a0a4e'}}>{ex.question}</p>
             </div>
 
             {/* Choix */}
             <div style={{display:'flex',flexDirection:'column',gap:'10px',marginBottom:'14px'}}>
-              {ex.choix.map((choice, i) => {
+              {ex.choix.map((c,i)=>{
                 let cls = 'choix-btn';
                 if (answered) {
-                  if (choice === ex.bonne)   cls += ' correct';
-                  else if (choice === selected) cls += ' incorrect';
+                  if (c===ex.bonne) cls+=' correct';
+                  else if (c===selected) cls+=' incorrect';
                 }
-                return (
-                  <button key={i} className={cls}
-                    onClick={() => handleAnswer(choice)}
-                    disabled={answered}>
-                    <span style={{opacity:0.5,marginRight:'8px',fontSize:'0.85rem'}}>{LETTERS[i]}.</span>
-                    {choice}
+                return(
+                  <button key={i} className={cls} onClick={()=>handleAnswer(c)} disabled={answered}>
+                    <span style={{display:'inline-flex',alignItems:'center',justifyContent:'center',
+                      width:'24px',height:'24px',borderRadius:'8px',background:'rgba(109,40,217,.12)',
+                      fontSize:'.78rem',fontWeight:800,marginRight:'10px',flexShrink:0,color:'#7c3aed'}}>
+                      {ALPHA[i]}
+                    </span>
+                    {c}
                   </button>
                 );
               })}
@@ -671,24 +634,21 @@
 
             {/* Feedback */}
             {answered && (
-              <div className={isOk ? 'fb-correct' : 'fb-incorrect'}
-                style={{borderRadius:'14px',padding:'12px 14px',marginBottom:'14px',
-                  fontWeight:600,fontSize:'0.85rem',lineHeight:1.5}}>
-                {isOk ? '✅ ' : '❌ '}
-                {isOk ? ex.expl_bravo : ex.expl_erreur}
+              <div className={isOk?'fb-correct':'fb-incorrect'} style={{marginBottom:'14px'}}>
+                {isOk ? '✅ ' : '❌ '}{isOk ? ex.expl_bravo : ex.expl_erreur}
               </div>
             )}
 
             {/* Bouton suivant */}
             {answered && (
               <button onClick={handleNext}
-                style={{width:'100%',padding:'16px',borderRadius:'18px',fontWeight:900,fontSize:'1rem',
+                style={{width:'100%',padding:'16px',borderRadius:'20px',fontWeight:900,fontSize:'1rem',
                   color:'white',border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif',
                   background:`linear-gradient(135deg,${niv.couleur},${niv.couleurDark})`,
-                  boxShadow:`0 6px 20px ${niv.couleur}44`,transition:'transform 0.15s'}}
+                  boxShadow:`0 6px 24px ${niv.couleur}55`,transition:'transform .15s'}}
                 onMouseEnter={e=>e.currentTarget.style.transform='scale(1.03)'}
                 onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
-                {exIdx+1 >= exercices.length ? 'Voir le résultat 🎉' : 'Question suivante →'}
+                {exIdx+1>=exercices.length?'Voir le résultat 🎉':'Question suivante →'}
               </button>
             )}
           </div>
@@ -697,73 +657,47 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // Écran Résultat
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // Résultat
+    // ══════════════════════════════════════════════════════════
     function CompleteScreen({ levelId, topicIdx, score, onBack, onRetry }) {
       const niv   = NIVEAUX[levelId];
       const theme = niv.matieres.francais.themes[topicIdx];
-      const pct   = score.total > 0 ? Math.round(score.correct/score.total*100) : 0;
-      const trophy = pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '💪';
-      const title  = pct >= 80 ? 'Excellent !'   : pct >= 50 ? 'Bien joué !'  : 'Continue !';
+      const pct   = score.total>0?Math.round(score.correct/score.total*100):0;
+      const trophy = pct>=80?'🏆':pct>=50?'⭐':'💪';
+      const title  = pct>=80?'Excellent !':pct>=50?'Bien joué !':'Continue !';
 
-      useEffect(() => {
-        if (pct >= 80) {
-          Teacher.encourager(`Félicitations ! Tu as réussi ${score.correct} exercice${score.correct>1?'s':''} sur ${score.total}. C'est excellent !`);
-          setTeacherMsg(`Bravo ! ${score.correct}/${score.total} — c'est fantastique !`);
-          fireworks(70);
-        } else {
-          Teacher.consoler(`Tu as fait ${score.correct} bonne${score.correct>1?'s':''} réponse${score.correct>1?'s':''} sur ${score.total}. Continue à t'entraîner !`);
-          setTeacherMsg(`${score.correct}/${score.total} — continue à t'entraîner !`);
-        }
+      useEffect(()=>{
+        if (pct>=80) fireworks(80);
       }, []);
 
       return (
         <div>
-          <TeacherZone initMsg={`${score.correct}/${score.total} — continue !`} />
+          <TeacherZone initMsg={`${score.correct}/${score.total} exercices réussis !`} />
           <div style={{padding:'0 16px 32px',textAlign:'center'}}>
-            <div style={{fontSize:'4rem',marginBottom:'8px'}}>{trophy}</div>
-            <h2 style={{fontWeight:900,fontSize:'1.5rem',marginBottom:'6px'}}>{title}</h2>
-            <p style={{color:'rgba(255,255,255,0.5)',fontSize:'0.9rem',marginBottom:'20px'}}>
-              {theme.emoji} {theme.nom}
-            </p>
+            <div style={{fontSize:'4.5rem',marginBottom:'8px'}}>{trophy}</div>
+            <h2 style={{fontWeight:900,fontSize:'1.6rem',marginBottom:'6px'}}>{title}</h2>
+            <p style={{color:'rgba(255,255,255,.5)',fontSize:'.9rem',marginBottom:'22px'}}>{theme.emoji} {theme.nom}</p>
 
-            <div className="glass-card" style={{padding:'20px',marginBottom:'20px'}}>
-              <div style={{fontWeight:900,fontSize:'2.5rem',marginBottom:'4px',color:niv.couleur}}>
-                {pct}%
+            <div className="ex-card" style={{marginBottom:'20px',textAlign:'center'}}>
+              <div style={{fontWeight:900,fontSize:'2.8rem',color:niv.couleur,marginBottom:'4px'}}>{pct}%</div>
+              <div className="progress-track" style={{height:'10px',marginBottom:'16px'}}>
+                <div className="progress-fill" style={{height:'10px',width:pct+'%',background:`linear-gradient(90deg,${niv.couleur},${niv.couleurDark})`}}></div>
               </div>
-              <div className="progress-track" style={{height:'10px',marginBottom:'14px'}}>
-                <div className="progress-fill" style={{height:'10px',width:pct+'%',
-                  background:`linear-gradient(90deg,${niv.couleur},${niv.couleurDark})`}}></div>
-              </div>
-              <div style={{display:'flex',justifyContent:'center',gap:'24px',fontSize:'0.9rem'}}>
-                <div>
-                  <span style={{color:'#4ade80',fontWeight:800,fontSize:'1.2rem'}}>{score.correct}</span>
-                  <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem'}}>bonnes</div>
-                </div>
-                <div>
-                  <span style={{color:'#f87171',fontWeight:800,fontSize:'1.2rem'}}>{score.total - score.correct}</span>
-                  <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem'}}>erreurs</div>
-                </div>
-                <div>
-                  <span style={{color:niv.couleur,fontWeight:800,fontSize:'1.2rem'}}>{score.total}</span>
-                  <div style={{color:'rgba(255,255,255,0.4)',fontSize:'0.75rem'}}>total</div>
-                </div>
+              <div style={{display:'flex',justifyContent:'center',gap:'28px',fontSize:'.9rem'}}>
+                <div><span style={{color:'#16a34a',fontWeight:800,fontSize:'1.4rem'}}>{score.correct}</span><div style={{color:'#6b7280',fontSize:'.73rem'}}>bonnes</div></div>
+                <div><span style={{color:'#dc2626',fontWeight:800,fontSize:'1.4rem'}}>{score.total-score.correct}</span><div style={{color:'#6b7280',fontSize:'.73rem'}}>erreurs</div></div>
+                <div><span style={{color:niv.couleur,fontWeight:800,fontSize:'1.4rem'}}>{score.total}</span><div style={{color:'#6b7280',fontSize:'.73rem'}}>total</div></div>
               </div>
             </div>
 
             <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
               <button onClick={onBack}
-                style={{padding:'15px',borderRadius:'16px',fontWeight:900,fontSize:'1rem',color:'white',
-                  border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif',
-                  background:`linear-gradient(135deg,${niv.couleur},${niv.couleurDark})`,
-                  boxShadow:`0 6px 20px ${niv.couleur}44`}}>
+                style={{padding:'15px',borderRadius:'18px',fontWeight:900,fontSize:'1rem',color:'white',border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif',background:`linear-gradient(135deg,${niv.couleur},${niv.couleurDark})`,boxShadow:`0 6px 20px ${niv.couleur}44`}}>
                 ← Retour aux thèmes
               </button>
-              <button onClick={onRetry}
-                className="glass-card"
-                style={{padding:'13px',borderRadius:'16px',fontWeight:700,fontSize:'0.95rem',
-                  color:'rgba(255,255,255,0.65)',border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif'}}>
+              <button onClick={onRetry} className="glass-card"
+                style={{padding:'13px',borderRadius:'16px',fontWeight:700,fontSize:'.95rem',color:'rgba(255,255,255,.65)',border:'none',cursor:'pointer',fontFamily:'Poppins,sans-serif'}}>
                 Recommencer 🔄
               </button>
             </div>
@@ -772,115 +706,67 @@
       );
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // App principale
-    // ═══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════
+    // App
+    // ══════════════════════════════════════════════════════════
     function App() {
-      const [screen,   setScreen]   = useState('loading');
-      const [user,     setUser]     = useState(null);
-      const [level,    setLevel]    = useState(null);
-      const [topicIdx, setTopic]    = useState(0);
-      const [score,    setScore]    = useState({correct:0,total:0});
+      const [screen,   setScreen]  = useState('loading');
+      const [user,     setUser]    = useState(null);
+      const [level,    setLevel]   = useState(null);
+      const [topicIdx, setTopic]   = useState(0);
+      const [score,    setScore]   = useState({correct:0,total:0});
 
-      useEffect(() => {
+      useEffect(()=>{
         Teacher.init();
         const cur = Profiles.getCurrent();
         if (cur) { setUser(cur); setScreen('home'); }
-        else      setScreen('profiles');
+        else       setScreen('profiles');
       }, []);
 
-      function onProfileSelect(name) {
-        setUser(name); setScreen('home');
-      }
+      const title = {
+        home:     "🎓 L'école magique",
+        themes:   level ? `${NIVEAUX[level]?.emoji} ${NIVEAUX[level]?.nom}` : '',
+        lesson:   level ? `${NIVEAUX[level]?.matieres?.francais?.themes?.[topicIdx]?.emoji} ${NIVEAUX[level]?.matieres?.francais?.themes?.[topicIdx]?.nom}` : '',
+        exercise: level ? `${NIVEAUX[level]?.matieres?.francais?.themes?.[topicIdx]?.emoji} ${NIVEAUX[level]?.matieres?.francais?.themes?.[topicIdx]?.nom}` : '',
+        complete: '🎉 Résultat',
+      }[screen] || "🎓 L'école magique";
 
-      function onLevelSelect(id) {
-        setLevel(id); setScreen('themes');
-      }
+      const back = {
+        themes:   ()=>setScreen('home'),
+        lesson:   ()=>setScreen('themes'),
+        exercise: ()=>setScreen('lesson'),
+        complete: ()=>setScreen('themes'),
+      }[screen] || null;
 
-      function onTopicSelect(idx) {
-        setTopic(idx); setScreen('lesson');
-      }
-
-      function onStartExercises() {
-        setScreen('exercise');
-      }
-
-      function onComplete(sc) {
-        setScore(sc); setScreen('complete');
-      }
-
-      function onSwitchUser() {
-        Profiles.logout(); // recharge la page
-      }
-
-      function getTitle() {
-        if (screen === 'home')     return "🎓 L'école magique";
-        if (screen === 'themes')   return `${NIVEAUX[level]?.emoji} ${NIVEAUX[level]?.nom}`;
-        if (screen === 'lesson' || screen === 'exercise') {
-          const t = NIVEAUX[level]?.matieres?.francais?.themes?.[topicIdx];
-          return t ? `${t.emoji} ${t.nom}` : 'Exercice';
-        }
-        if (screen === 'complete') return '🎉 Résultat';
-        return "🎓 L'école magique";
-      }
-
-      function getBack() {
-        if (screen === 'themes')   return () => setScreen('home');
-        if (screen === 'lesson')   return () => setScreen('themes');
-        if (screen === 'exercise') return () => setScreen('lesson');
-        if (screen === 'complete') return () => setScreen('themes');
-        return null;
-      }
-
-      if (screen === 'loading') {
-        return (
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',flexDirection:'column',gap:'16px'}}>
-            <div style={{fontSize:'4rem'}}>✨</div>
-            <p style={{color:'rgba(255,255,255,0.5)'}}>Chargement...</p>
-          </div>
-        );
-      }
+      if (screen==='loading') return (
+        <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',flexDirection:'column',gap:'16px'}}>
+          <div style={{fontSize:'4rem'}}>✨</div>
+          <p style={{color:'rgba(255,255,255,.4)'}}>Chargement...</p>
+        </div>
+      );
 
       return (
         <div style={{minHeight:'100vh'}}>
-          {screen !== 'profiles' && user && (
-            <HUD onBack={getBack()} title={getTitle()} onSwitch={onSwitchUser} />
-          )}
+          {screen!=='profiles'&&user&&<HUD onBack={back} title={title} onSwitch={()=>{ Profiles.logout(); }} />}
 
-          {screen === 'profiles' && <ProfileModal onSelect={onProfileSelect} />}
-
-          {screen === 'home' && user && (
-            <HomeScreen user={user} onSelectLevel={onLevelSelect} />
-          )}
-
-          {screen === 'themes' && level && (
-            <ThemesScreen levelId={level} onSelectTopic={onTopicSelect} />
-          )}
-
-          {screen === 'lesson' && level && (
-            <LessonScreen levelId={level} topicIdx={topicIdx} onStartExercises={onStartExercises} />
-          )}
-
-          {screen === 'exercise' && level && (
-            <ExerciseScreen
-              key={`${level}-${topicIdx}`}
+          {screen==='profiles' && <ProfileModal onSelect={n=>{setUser(n);setScreen('home');}} />}
+          {screen==='home'     && user && <HomeScreen user={user} onSelectLevel={id=>{setLevel(id);setScreen('themes');}} />}
+          {screen==='themes'   && level && <ThemesScreen levelId={level} onSelectTopic={i=>{setTopic(i);setScreen('lesson');}} />}
+          {screen==='lesson'   && level && <LessonScreen levelId={level} topicIdx={topicIdx} onStart={()=>setScreen('exercise')} />}
+          {screen==='exercise' && level && (
+            <ExerciseScreen key={`${level}-${topicIdx}-${score.total}`}
               levelId={level} topicIdx={topicIdx}
-              onComplete={onComplete}
-            />
+              onComplete={sc=>{setScore(sc);setScreen('complete');}} />
           )}
-
-          {screen === 'complete' && level && (
-            <CompleteScreen
-              levelId={level} topicIdx={topicIdx} score={score}
-              onBack={() => setScreen('themes')}
-              onRetry={() => setScreen('exercise')}
-            />
+          {screen==='complete' && level && (
+            <CompleteScreen levelId={level} topicIdx={topicIdx} score={score}
+              onBack={()=>setScreen('themes')}
+              onRetry={()=>setScreen('exercise')} />
           )}
         </div>
       );
     }
 
-    // Montage React
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
