@@ -21,6 +21,7 @@
     <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
     <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
+
   <main>
     <div class="teacher-zone">
       <div id="teacher-avatar" class="avatar-idle">
@@ -30,66 +31,424 @@
           <div class="teacher-name-badge">Mme Sophie</div>
         </div>
       </div>
-      <div class="speech-bubble" id="teacher-bubble">Entraînons-nous à conjuguer !</div>
+      <div class="speech-bubble" id="teacher-bubble">Bienvenue en conjugaison !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
+
     <div class="exercice-zone">
-      <div class="exercice-card" id="lecon-card">
-        <h2 id="temps-titre">⏱️ Le temps du jour</h2>
-        <div class="lecon-box" id="lecon-contenu"></div>
-        <div style="text-align:center;"><button class="btn-action btn-green" onclick="commencerExercices()">Je suis prête ! →</button></div>
+
+      <!-- Sélection du temps -->
+      <div class="exercice-card" id="menu-temps">
+        <h2>⏱️ Quel temps veux-tu travailler ?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;" id="liste-temps"></div>
       </div>
+
+      <!-- Leçon -->
+      <div class="exercice-card" id="lecon-card" style="display:none;">
+        <h2 id="lecon-titre"></h2>
+        <div class="lecon-box" id="lecon-contenu"></div>
+        <div style="text-align:center;">
+          <button class="btn-action btn-green" onclick="commencerExercices()">Je suis prête, on s'entraîne ! →</button>
+        </div>
+      </div>
+
+      <!-- Exercice -->
       <div class="exercice-card" id="exo-card" style="display:none;">
-        <h2>✍️ Complète la phrase</h2>
-        <p id="phrase-trouee" style="font-size:1.1rem;font-weight:700;text-align:center;margin:14px 0;color:white;line-height:1.7;"></p>
-        <p style="color:rgba(255,255,255,0.4);font-style:italic;text-align:center;font-size:0.85rem;" id="indice-temps"></p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h2 id="exo-titre" style="margin:0;"></h2>
+          <span id="exo-compteur" style="color:rgba(255,255,255,0.4);font-size:0.82rem;font-weight:600;"></span>
+        </div>
+        <div class="lecon-box" id="exo-rappel" style="margin-bottom:14px;font-size:0.85rem;"></div>
+        <p id="phrase-trouee" style="font-size:1.2rem;font-weight:800;text-align:center;margin:16px 0;color:white;line-height:1.7;"></p>
         <div class="choix-grid" id="choix-conj"></div>
         <div class="feedback" id="feedback-conj"></div>
+        <div class="lecon-box" id="explication-detail" style="display:none;margin-top:12px;font-size:0.88rem;"></div>
       </div>
+
       <div style="text-align:center;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn-action btn-green" onclick="prochainExercice()" id="btn-suivant" style="display:none;">Question suivante →</button>
-        <button class="btn-action btn-primary" onclick="changerTemps()" id="btn-temps" style="display:none;">Temps suivant →</button>
+        <button class="btn-action btn-green"   onclick="prochainExercice()" id="btn-suivant"    style="display:none;">Question suivante →</button>
+        <button class="btn-action btn-primary" onclick="retourMenu()"       id="btn-autre-temps" style="display:none;">Choisir un autre temps →</button>
       </div>
+
     </div>
   </main>
+
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
-    const lecons = [
-      { temps:"Présent de l'indicatif", explication:"Le présent = action en cours maintenant.\n\n📌 CHANTER : Je chante · Tu chantes · Il chante\nNous chantons · Vous chantez · Ils chantent\n\n💡 Terminaisons : -e, -es, -e, -ons, -ez, -ent",
-        exercices:[{phrase:"Elle ___ (chanter) une belle chanson.",bonne:"chante",choix:["chante","chantait","chantera","a chanté"]},{phrase:"Nous ___ (manger) à midi.",bonne:"mangeons",choix:["mangeons","mangions","mangerons","avons mangé"]},{phrase:"Tu ___ (finir) tes devoirs.",bonne:"finis",choix:["finis","finissais","finiras","as fini"]}]},
-      { temps:"Imparfait de l'indicatif", explication:"L'imparfait = action passée qui durait ou habitude.\n\n📌 JOUER : Je jouais · Tu jouais · Il jouait\nNous jouions · Vous jouiez · Ils jouaient\n\n💡 Terminaisons : -ais, -ais, -ait, -ions, -iez, -aient",
-        exercices:[{phrase:"Quand j'étais petit, je ___ (jouer) dehors.",bonne:"jouais",choix:["jouais","joue","jouerai","ai joué"]},{phrase:"Il ___ (faire) beau tous les étés.",bonne:"faisait",choix:["faisait","fait","fera","a fait"]},{phrase:"Nous ___ (partir) en vacances chaque année.",bonne:"partions",choix:["partions","partons","partirons","sommes partis"]}]},
-      { temps:"Futur simple", explication:"Le futur simple = action qui se passera plus tard.\n\n📌 PARLER : Je parlerai · Tu parleras · Il parlera\nNous parlerons · Vous parlerez · Ils parleront\n\n💡 Terminaisons : -ai, -as, -a, -ons, -ez, -ont",
-        exercices:[{phrase:"Demain, je ___ (aller) à l'école.",bonne:"irai",choix:["irai","vais","allais","suis allé"]},{phrase:"Tu ___ (apprendre) beaucoup de choses.",bonne:"apprendras",choix:["apprendras","apprends","apprenais","as appris"]},{phrase:"Ils ___ (venir) nous rendre visite.",bonne:"viendront",choix:["viendront","viennent","venaient","sont venus"]}]}
-    ];
-    let ti=0, ei=0;
-    window.addEventListener('load',()=>{Teacher.init();initProfileSystem(name=>{setTimeout(()=>{afficherLecon(0);Teacher.expliquer("Bienvenue en conjugaison "+name+" ! Lis la leçon, ensuite on s'entraîne !");},700);});});
-    function afficherLecon(i){const l=lecons[i];document.getElementById('temps-titre').textContent='⏱️ '+l.temps;document.getElementById('lecon-contenu').innerHTML=l.explication.replace(/\n/g,'<br>');document.getElementById('lecon-card').style.display='block';document.getElementById('exo-card').style.display='none';document.getElementById('btn-suivant').style.display='none';document.getElementById('btn-temps').style.display='none';ei=0;}
-    function commencerExercices(){document.getElementById('lecon-card').style.display='none';document.getElementById('exo-card').style.display='block';afficherExercice();Teacher.poserQuestion("C'est parti ! Complète les phrases.");}
-    function afficherExercice(){
-      const exos=lecons[ti].exercices;
-      if(ei>=exos.length){document.getElementById('exo-card').innerHTML='<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Bravo ! Tu maîtrises ce temps !</h2>';lancerConfettis();Profiles.saveProgression('conjugaison',{[lecons[ti].temps]:true,date:new Date().toLocaleDateString()});document.getElementById('btn-temps').style.display=ti<lecons.length-1?'inline-flex':'none';Teacher.encourager("Félicitations ! Tu maîtrises "+lecons[ti].temps+" !");return;}
-      const ex=exos[ei];
-      document.getElementById('phrase-trouee').textContent=ex.phrase;
-      document.getElementById('indice-temps').textContent='⏱️ '+lecons[ti].temps;
-      document.getElementById('feedback-conj').className='feedback';
-      document.getElementById('btn-suivant').style.display='none';
-      let html='';ex.choix.forEach(c=>{html+=`<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`;});
-      document.getElementById('choix-conj').innerHTML=html;
-      Teacher.poserQuestion(ex.phrase.replace('___','...'));
+
+  // ============================================================
+  // BASE DE DONNÉES COMPLÈTE
+  // ============================================================
+  const TEMPS = [
+    {
+      id: "present",
+      nom: "Présent de l'indicatif",
+      emoji: "🟢",
+      lecon: `Le présent décrit une action qui se passe <strong>maintenant</strong> ou une vérité générale.<br><br>
+<strong>1er groupe (-ER) :</strong> radical + <em>e, es, e, ons, ez, ent</em><br>
+→ CHANTER : je chant<u>e</u>, tu chant<u>es</u>, il chant<u>e</u>, nous chant<u>ons</u>, vous chant<u>ez</u>, ils chant<u>ent</u><br><br>
+<strong>2e groupe (-IR) :</strong> radical + <em>is, is, it, issons, issez, issent</em><br>
+→ FINIR : je fin<u>is</u>, tu fin<u>is</u>, il fin<u>it</u>, nous fin<u>issons</u>, vous fin<u>issez</u>, ils fin<u>issent</u><br><br>
+<strong>Verbes irréguliers à retenir par cœur :</strong><br>
+→ ÊTRE : je suis, tu es, il est, nous sommes, vous êtes, ils sont<br>
+→ AVOIR : j'ai, tu as, il a, nous avons, vous avez, ils ont<br>
+→ ALLER : je vais, tu vas, il va, nous allons, vous allez, ils vont<br>
+→ FAIRE : je fais, tu fais, il fait, nous faisons, vous faites, ils font`,
+      exercices: [
+        { phrase:"Elle ___ (chanter) une belle chanson.", bonne:"chante",    choix:["chante","chantait","chantera","chantent"],
+          rappel:"Chanter → 1er groupe. Avec 'elle' : radical CHANT + terminaison -e.",
+          expl_bravo:"Parfait ! CHANT + e = chante. Avec il/elle au présent, les verbes du 1er groupe prennent -e.",
+          expl_erreur:"Chanter est du 1er groupe. Avec 'elle', on prend le radical CHANT et on ajoute -e. On obtient : elle CHANTE." },
+        { phrase:"Nous ___ (parler) français à l'école.", bonne:"parlons",   choix:["parlons","parlais","parlerons","parlent"],
+          rappel:"Parler → 1er groupe. Avec 'nous' : radical PARL + terminaison -ons.",
+          expl_bravo:"Bravo ! PARL + ons = parlons. Avec 'nous', les verbes du 1er groupe prennent toujours -ons.",
+          expl_erreur:"Parler est du 1er groupe. Avec 'nous', on prend le radical PARL et on ajoute -ons → nous PARLONS." },
+        { phrase:"Vous ___ (jouer) au foot après l'école.", bonne:"jouez",   choix:["jouez","jouiez","jouerez","jouent"],
+          rappel:"Jouer → 1er groupe. Avec 'vous' : radical JOU + terminaison -ez.",
+          expl_bravo:"Très bien ! JOU + ez = jouez. Avec 'vous', les verbes du 1er groupe prennent -ez.",
+          expl_erreur:"Jouer est du 1er groupe. Avec 'vous', on ajoute -ez au radical JOU → vous JOUEZ." },
+        { phrase:"Ils ___ (manger) à la cantine.", bonne:"mangent",          choix:["mangent","mangeait","mangeront","mangeons"],
+          rappel:"Manger → 1er groupe. Avec 'ils' : radical MANGE + terminaison -nt.",
+          expl_bravo:"Excellent ! Avec 'ils', les verbes du 1er groupe prennent -ent : ils MANGENT.",
+          expl_erreur:"Manger est du 1er groupe. Avec 'ils', on ajoute -ent → ils MANGENT. Attention à ne pas confondre avec 'nous mangeons'." },
+        { phrase:"Tu ___ (finir) tes devoirs avant le dîner.", bonne:"finis", choix:["finis","finissait","finiras","finissent"],
+          rappel:"Finir → 2e groupe (-IR). Avec 'tu' : radical FIN + terminaison -is.",
+          expl_bravo:"Parfait ! Finir est du 2e groupe. Avec 'tu' → tu FINIS.",
+          expl_erreur:"Finir est du 2e groupe. Avec 'tu', on ajoute -is au radical FIN → tu FINIS. Les verbes du 2e groupe ont -is, -is, -it, -issons, -issez, -issent." },
+        { phrase:"Elle ___ (choisir) un livre à la bibliothèque.", bonne:"choisit", choix:["choisit","choisissait","choisira","choisissent"],
+          rappel:"Choisir → 2e groupe (-IR). Avec 'elle' : radical CHOIS + terminaison -it.",
+          expl_bravo:"Bravo ! Choisir est du 2e groupe. Avec 'elle' → elle CHOISIT.",
+          expl_erreur:"Choisir est du 2e groupe. Avec 'elle', on prend le radical CHOIS et on ajoute -it → elle CHOISIT." },
+        { phrase:"Je ___ (être) très content aujourd'hui.", bonne:"suis",    choix:["suis","étais","serai","es"],
+          rappel:"ÊTRE est irrégulier. Il faut l'apprendre par cœur : je SUIS, tu es, il est...",
+          expl_bravo:"Très bien ! ÊTRE est irrégulier : je SUIS. Il faut le retenir par cœur.",
+          expl_erreur:"ÊTRE est un verbe irrégulier. Avec 'je', il ne suit aucune règle : je SUIS. À apprendre par cœur !" },
+        { phrase:"Tu ___ (avoir) un joli cartable.", bonne:"as",             choix:["as","avais","auras","a"],
+          rappel:"AVOIR est irrégulier : j'ai, tu AS, il a, nous avons, vous avez, ils ont.",
+          expl_bravo:"Parfait ! AVOIR est irrégulier : tu AS. Retiens bien : j'ai, tu as, il a.",
+          expl_erreur:"AVOIR est irrégulier. Avec 'tu', c'est : tu AS. Attention à ne pas confondre avec 'il a'." },
+        { phrase:"Nous ___ (aller) au cinéma samedi.", bonne:"allons",       choix:["allons","allions","irons","allez"],
+          rappel:"ALLER est irrégulier : je vais, tu vas, il va, nous ALLONS, vous allez, ils vont.",
+          expl_bravo:"Excellent ! ALLER est irrégulier, mais avec 'nous', c'est régulier : nous ALLONS.",
+          expl_erreur:"ALLER est irrégulier. Avec 'nous', c'est : nous ALLONS. Note : au futur, aller devient 'irons' (irrégulier)." },
+        { phrase:"Il ___ (faire) très froid en hiver.", bonne:"fait",        choix:["fait","faisait","fera","ferait"],
+          rappel:"FAIRE est irrégulier : je fais, tu fais, il FAIT, nous faisons, vous faites, ils font.",
+          expl_bravo:"Bravo ! FAIRE est irrégulier. Avec 'il' : il FAIT. À retenir !",
+          expl_erreur:"FAIRE est irrégulier. Avec 'il', c'est : il FAIT. Retiens bien : je fais, tu fais, il fait, nous faisons, vous faites, ils font." }
+      ]
+    },
+    {
+      id: "imparfait",
+      nom: "Imparfait de l'indicatif",
+      emoji: "🔵",
+      lecon: `L'imparfait décrit une action passée qui <strong>durait</strong> dans le temps, ou une <strong>habitude du passé</strong>.<br><br>
+<strong>Formation :</strong> radical du présent (nous) + <em>ais, ais, ait, ions, iez, aient</em><br><br>
+<strong>1er groupe (-ER) :</strong><br>
+→ CHANTER : je chant<u>ais</u>, tu chant<u>ais</u>, il chant<u>ait</u>, nous chant<u>ions</u>, vous chant<u>iez</u>, ils chant<u>aient</u><br><br>
+<strong>2e groupe (-IR) :</strong><br>
+→ FINIR : je finiss<u>ais</u>, tu finiss<u>ais</u>, il finiss<u>ait</u>, nous finiss<u>ions</u>, vous finiss<u>iez</u>, ils finiss<u>aient</u><br><br>
+<strong>Verbes irréguliers :</strong><br>
+→ ÊTRE : j'étais, tu étais, il était, nous étions, vous étiez, ils étaient<br>
+→ AVOIR : j'avais, tu avais, il avait, nous avions, vous aviez, ils avaient<br>
+→ FAIRE : je faisais, tu faisais, il faisait, nous faisions, vous faisiez, ils faisaient<br><br>
+<strong>Astuce :</strong> L'imparfait se reconnaît souvent avec "autrefois", "quand j'étais petit", "tous les jours".`,
+      exercices: [
+        { phrase:"Quand elle était petite, elle ___ (chanter) tout le temps.", bonne:"chantait",    choix:["chantait","chante","chantera","a chanté"],
+          rappel:"Imparfait du 1er groupe avec 'elle' : radical CHANT + terminaison -ait.",
+          expl_bravo:"Parfait ! CHANT + ait = chantait. L'imparfait avec 'il/elle' prend toujours -ait.",
+          expl_erreur:"C'est l'imparfait ici. Chanter est du 1er groupe. Avec 'elle' : radical CHANT + -ait → elle CHANTAIT." },
+        { phrase:"Tous les matins, nous ___ (parler) à nos voisins.", bonne:"parlions",             choix:["parlions","parlons","parlâmes","parlerons"],
+          rappel:"Imparfait avec 'nous' : radical PARL + terminaison -ions.",
+          expl_bravo:"Bravo ! PARL + ions = parlions. Avec 'nous', l'imparfait prend toujours -ions.",
+          expl_erreur:"Imparfait + 'nous' : on prend le radical PARL et on ajoute -ions → nous PARLIONS." },
+        { phrase:"Vous ___ (jouer) dans le jardin chaque été.", bonne:"jouiez",                     choix:["jouiez","jouez","jouerez","avez joué"],
+          rappel:"Imparfait avec 'vous' : radical JOU + terminaison -iez.",
+          expl_bravo:"Excellent ! JOU + iez = jouiez. Avec 'vous', l'imparfait prend -iez.",
+          expl_erreur:"Imparfait + 'vous' : radical JOU + -iez → vous JOUIEZ. Ne confonds pas avec le présent 'jouez'." },
+        { phrase:"Autrefois, les enfants ___ (finir) l'école à midi.", bonne:"finissaient",         choix:["finissaient","finissent","finiront","ont fini"],
+          rappel:"Imparfait du 2e groupe avec 'ils' : radical FINISS + terminaison -aient.",
+          expl_bravo:"Parfait ! Finir est du 2e groupe. Avec 'ils' à l'imparfait : ils FINISSAIENT.",
+          expl_erreur:"Finir est du 2e groupe. À l'imparfait + 'ils' : radical FINISS + -aient → ils FINISSAIENT." },
+        { phrase:"Quand j'___ (être) petit, j'adorais les bonbons.", bonne:"étais",                choix:["étais","suis","serai","fus"],
+          rappel:"ÊTRE à l'imparfait : j'ÉTAIS, tu étais, il était, nous étions...",
+          expl_bravo:"Très bien ! ÊTRE à l'imparfait + 'je' = j'ÉTAIS. À apprendre par cœur.",
+          expl_erreur:"ÊTRE est irrégulier. À l'imparfait, avec 'je' : j'ÉTAIS. Retiens : j'étais, tu étais, il était, nous étions, vous étiez, ils étaient." },
+        { phrase:"Il ___ (avoir) beaucoup d'amis à l'école.", bonne:"avait",                       choix:["avait","a","aura","avait eu"],
+          rappel:"AVOIR à l'imparfait avec 'il' : il AVAIT.",
+          expl_bravo:"Bravo ! AVOIR à l'imparfait + 'il' = il AVAIT.",
+          expl_erreur:"AVOIR est irrégulier. À l'imparfait, avec 'il' : il AVAIT. Retiens : j'avais, tu avais, il avait..." },
+        { phrase:"Elle ___ (faire) du vélo tous les weekends.", bonne:"faisait",                    choix:["faisait","fait","fera","a fait"],
+          rappel:"FAIRE à l'imparfait avec 'elle' : elle FAISAIT.",
+          expl_bravo:"Excellent ! FAIRE à l'imparfait + 'elle' = elle FAISAIT.",
+          expl_erreur:"FAIRE est irrégulier. À l'imparfait + 'elle' : elle FAISAIT. Retiens : je faisais, tu faisais, il faisait..." },
+        { phrase:"Nous ___ (aller) à la mer chaque été.", bonne:"allions",                         choix:["allions","allons","irons","sommes allés"],
+          rappel:"ALLER à l'imparfait avec 'nous' : nous ALLIONS.",
+          expl_bravo:"Parfait ! ALLER à l'imparfait + 'nous' = nous ALLIONS.",
+          expl_erreur:"ALLER à l'imparfait. Avec 'nous' : nous ALLIONS. Retiens : j'allais, tu allais, il allait, nous allions..." }
+      ]
+    },
+    {
+      id: "futur",
+      nom: "Futur simple",
+      emoji: "🟡",
+      lecon: `Le futur simple décrit une action qui <strong>se passera plus tard</strong>.<br><br>
+<strong>Formation :</strong> infinitif + <em>ai, as, a, ons, ez, ont</em><br><br>
+<strong>1er et 2e groupes :</strong><br>
+→ CHANTER : je chanter<u>ai</u>, tu chanter<u>as</u>, il chanter<u>a</u>, nous chanter<u>ons</u>, vous chanter<u>ez</u>, ils chanter<u>ont</u><br>
+→ FINIR : je finir<u>ai</u>, tu finir<u>as</u>, il finir<u>a</u>, nous finir<u>ons</u>, vous finir<u>ez</u>, ils finir<u>ont</u><br><br>
+<strong>Verbes irréguliers (radical change) :</strong><br>
+→ ÊTRE : je <u>ser</u>ai, tu seras, il sera, nous serons, vous serez, ils seront<br>
+→ AVOIR : j'<u>aur</u>ai, tu auras, il aura, nous aurons, vous aurez, ils auront<br>
+→ ALLER : j'<u>ir</u>ai, tu iras, il ira, nous irons, vous irez, ils iront<br>
+→ FAIRE : je <u>fer</u>ai, tu feras, il fera, nous ferons, vous ferez, ils feront<br><br>
+<strong>Astuce :</strong> Au futur, les terminaisons sont toujours les mêmes pour tous les verbes !`,
+      exercices: [
+        { phrase:"Demain, je ___ (chanter) devant toute la classe.", bonne:"chanterai",  choix:["chanterai","chante","chantais","chanterais"],
+          rappel:"Futur du 1er groupe avec 'je' : infinitif CHANTER + terminaison -ai → chanterai.",
+          expl_bravo:"Parfait ! CHANTER + ai = chanterai. Au futur, 'je' prend toujours -ai.",
+          expl_erreur:"Au futur + 'je', on prend l'infinitif CHANTER et on ajoute -ai → je CHANTERAI." },
+        { phrase:"Tu ___ (parler) à ta maîtresse demain.", bonne:"parleras",             choix:["parleras","parles","parlais","parleras"],
+          rappel:"Futur du 1er groupe avec 'tu' : infinitif PARLER + terminaison -as → parleras.",
+          expl_bravo:"Bravo ! PARLER + as = parleras. Au futur, 'tu' prend -as.",
+          expl_erreur:"Au futur + 'tu' : infinitif PARLER + -as → tu PARLERAS." },
+        { phrase:"Ils ___ (jouer) au parc cet après-midi.", bonne:"joueront",            choix:["joueront","jouent","jouaient","joueraient"],
+          rappel:"Futur du 1er groupe avec 'ils' : infinitif JOUER + terminaison -ont → joueront.",
+          expl_bravo:"Excellent ! JOUER + ont = joueront. Avec 'ils', le futur prend -ont.",
+          expl_erreur:"Au futur + 'ils' : JOUER + -ont → ils JOUERONT." },
+        { phrase:"Elle ___ (finir) son livre ce soir.", bonne:"finira",                  choix:["finira","finit","finissait","finissait"],
+          rappel:"Futur du 2e groupe avec 'elle' : infinitif FINIR + terminaison -a → finira.",
+          expl_bravo:"Parfait ! FINIR + a = finira. Au futur, 'il/elle' prend -a.",
+          expl_erreur:"Au futur + 'elle' : FINIR + -a → elle FINIRA. Les verbes du 2e groupe gardent leur infinitif entier." },
+        { phrase:"Nous ___ (choisir) notre destination de vacances.", bonne:"choisirons", choix:["choisirons","choisissons","choisissions","choisiront"],
+          rappel:"Futur du 2e groupe avec 'nous' : infinitif CHOISIR + terminaison -ons → choisirons.",
+          expl_bravo:"Bravo ! CHOISIR + ons = choisirons. Avec 'nous', le futur prend -ons.",
+          expl_erreur:"Au futur + 'nous' : CHOISIR + -ons → nous CHOISIRONS." },
+        { phrase:"Je ___ (être) médecin quand je serai grande.", bonne:"serai",          choix:["serai","suis","étais","serais"],
+          rappel:"ÊTRE au futur est irrégulier. Le radical devient SER- : je SERAI.",
+          expl_bravo:"Excellent ! ÊTRE au futur est irrégulier : radical SER + ai = je SERAI.",
+          expl_erreur:"ÊTRE au futur est irrégulier ! Le radical change : SER + ai = je SERAI. Retiens : je serai, tu seras, il sera..." },
+        { phrase:"Tu ___ (avoir) une belle surprise demain.", bonne:"auras",             choix:["auras","as","avais","aurais"],
+          rappel:"AVOIR au futur est irrégulier. Le radical devient AUR- : tu AURAS.",
+          expl_bravo:"Parfait ! AVOIR au futur : radical AUR + as = tu AURAS.",
+          expl_erreur:"AVOIR au futur est irrégulier ! Radical AUR + as = tu AURAS. Retiens : j'aurai, tu auras, il aura..." },
+        { phrase:"Nous ___ (aller) en voyage scolaire la semaine prochaine.", bonne:"irons", choix:["irons","allons","allions","irez"],
+          rappel:"ALLER au futur est irrégulier. Le radical devient IR- : nous IRONS.",
+          expl_bravo:"Bravo ! ALLER au futur est irrégulier : radical IR + ons = nous IRONS.",
+          expl_erreur:"ALLER au futur est très irrégulier ! Le radical devient IR : nous IRONS. Retiens : j'irai, tu iras, il ira, nous irons..." },
+        { phrase:"Il ___ (faire) beau pendant les vacances.", bonne:"fera",              choix:["fera","fait","faisait","ferait"],
+          rappel:"FAIRE au futur est irrégulier. Le radical devient FER- : il FERA.",
+          expl_bravo:"Excellent ! FAIRE au futur : radical FER + a = il FERA.",
+          expl_erreur:"FAIRE au futur est irrégulier ! Radical FER + a = il FERA. Retiens : je ferai, tu feras, il fera..." }
+      ]
+    },
+    {
+      id: "passe_compose",
+      nom: "Passé composé",
+      emoji: "🟣",
+      lecon: `Le passé composé décrit une action <strong>terminée dans le passé</strong>.<br><br>
+<strong>Formation :</strong> auxiliaire AVOIR ou ÊTRE au présent + participe passé<br><br>
+<strong>Avec AVOIR :</strong> la plupart des verbes<br>
+→ CHANTER : j'ai chanté, tu as chanté, il a chanté, nous avons chanté, vous avez chanté, ils ont chanté<br>
+→ FINIR : j'ai fini, tu as fini, il a fini...<br>
+→ FAIRE : j'ai fait, tu as fait, il a fait...<br><br>
+<strong>Avec ÊTRE :</strong> les verbes de déplacement et de changement d'état<br>
+→ ALLER : je suis allé(e), tu es allé(e), il est allé / elle est allée...<br>
+→ VENIR : je suis venu(e)...<br>
+→ PARTIR : je suis parti(e)...<br><br>
+<strong>Astuce :</strong> Avec ÊTRE, le participe passé s'accorde avec le sujet !<br>
+→ Il est parti. / Elle est <u>partie</u>. / Ils sont partis. / Elles sont <u>parties</u>.`,
+      exercices: [
+        { phrase:"Elle ___ (chanter) une chanson magnifique hier.", bonne:"a chanté",    choix:["a chanté","est chantée","chantait","chantera"],
+          rappel:"Passé composé de chanter : auxiliaire AVOIR + participe passé CHANTÉ.",
+          expl_bravo:"Parfait ! AVOIR (elle a) + chanté = elle A CHANTÉ. Chanter se conjugue avec AVOIR.",
+          expl_erreur:"Chanter se conjugue avec AVOIR au passé composé. Avec 'elle' : elle A CHANTÉ. Le participe passé de chanter est chanté." },
+        { phrase:"Nous ___ (finir) notre projet hier soir.", bonne:"avons fini",         choix:["avons fini","sommes finis","finissions","avons finit"],
+          rappel:"Passé composé de finir : auxiliaire AVOIR + participe passé FINI.",
+          expl_bravo:"Bravo ! AVOIR (nous avons) + fini = nous AVONS FINI. Le participe de finir est fini (sans t !).",
+          expl_erreur:"Finir se conjugue avec AVOIR. Nous AVONS FINI. Attention : le participe passé est 'fini' sans t final !" },
+        { phrase:"Il ___ (aller) chez son ami ce matin.", bonne:"est allé",             choix:["est allé","a allé","allait","ira"],
+          rappel:"Aller se conjugue avec ÊTRE au passé composé : il EST ALLÉ.",
+          expl_bravo:"Excellent ! ALLER se conjugue avec ÊTRE. Il EST ALLÉ. Avec ÊTRE, le participe s'accorde : il est allé, elle est allée.",
+          expl_erreur:"ALLER se conjugue avec ÊTRE (pas avoir). Il EST ALLÉ. Retiens : les verbes de déplacement vont avec ÊTRE." },
+        { phrase:"Elles ___ (partir) tôt ce matin.", bonne:"sont parties",             choix:["sont parties","ont parti","sont partis","partaient"],
+          rappel:"Partir se conjugue avec ÊTRE. Avec 'elles' (féminin pluriel), le participe s'accorde : parties.",
+          expl_bravo:"Parfait ! PARTIR + ÊTRE + accord féminin pluriel = elles SONT PARTIES. Bravo, tu as pensé à l'accord !",
+          expl_erreur:"Partir se conjugue avec ÊTRE. Avec 'elles' (féminin pluriel), on écrit : elles SONT PARTIES. Le e et le s montrent que ce sont des filles, en groupe." },
+        { phrase:"Tu ___ (faire) une erreur dans ton exercice.", bonne:"as fait",       choix:["as fait","es fait","faisais","feras"],
+          rappel:"Faire se conjugue avec AVOIR au passé composé. Participe passé : FAIT.",
+          expl_bravo:"Très bien ! FAIRE → tu AS FAIT. Le participe passé de faire est fait.",
+          expl_erreur:"Faire se conjugue avec AVOIR. Tu AS FAIT. Le participe passé de faire est 'fait'." },
+        { phrase:"J'___ (avoir) un beau cadeau pour mon anniversaire.", bonne:"ai eu",  choix:["ai eu","suis eu","avais","ai avé"],
+          rappel:"Avoir au passé composé : AVOIR + participe passé EU (irrégulier).",
+          expl_bravo:"Bravo ! AVOIR au passé composé : j'AI EU. Le participe passé d'avoir est EU.",
+          expl_erreur:"Avoir au passé composé : j'AI EU. Le participe passé d'avoir est EU (irrégulier, à retenir !)." },
+        { phrase:"Nous ___ (être) en retard à cause des embouteillages.", bonne:"avons été", choix:["avons été","sommes été","étions","avons êté"],
+          rappel:"Être au passé composé : AVOIR + participe passé ÉTÉ (irrégulier).",
+          expl_bravo:"Excellent ! ÊTRE au passé composé se conjugue avec AVOIR : nous AVONS ÉTÉ. Le participe d'être est ÉTÉ.",
+          expl_erreur:"Être au passé composé : on utilise AVOIR (pas être). Nous AVONS ÉTÉ. Le participe passé d'être est ÉTÉ." }
+      ]
     }
-    function verifier(rep,bonne,btn){
-      document.querySelectorAll('.choix-btn').forEach(b=>b.disabled=true);
-      const fb=document.getElementById('feedback-conj');
-      if(rep===bonne){btn.classList.add('correct');fb.textContent='✅ Parfait ! "'+bonne+'" est la bonne forme.';fb.className='feedback bravo';SFX.correct();lancerConfettis();const lu=Profiles.addXP(10);updateHUD();if(lu){SFX.levelUp();afficherToast();}Teacher.encourager("Parfait ! "+bonne+" est la bonne réponse !");}
-      else{btn.classList.add('incorrect');document.querySelectorAll('.choix-btn')[lecons[ti].exercices[ei].choix.indexOf(bonne)].classList.add('correct');fb.textContent='❌ La bonne réponse était : '+bonne;fb.className='feedback erreur';SFX.incorrect();Profiles.loseHeart();updateHUD();Teacher.consoler("Pas tout à fait. La bonne réponse était : "+bonne);}
-      document.getElementById('btn-suivant').style.display='inline-flex';
+  ];
+
+  // ============================================================
+  // LOGIQUE
+  // ============================================================
+  let tempsActuel = null;
+  let exoIndex = 0;
+  let userName = '';
+
+  window.addEventListener('load', () => {
+    Teacher.init();
+    initProfileSystem(name => {
+      userName = name;
+      setTimeout(() => {
+        afficherMenu();
+        Teacher.encourager("Bonjour " + name + " ! Je suis Madame Sophie. En conjugaison, on va travailler le présent, l'imparfait, le futur et le passé composé. Quel temps veux-tu réviser ?");
+      }, 700);
+    });
+  });
+
+  function afficherMenu() {
+    document.getElementById('menu-temps').style.display = 'block';
+    document.getElementById('lecon-card').style.display = 'none';
+    document.getElementById('exo-card').style.display = 'none';
+    document.getElementById('btn-suivant').style.display = 'none';
+    document.getElementById('btn-autre-temps').style.display = 'none';
+
+    const liste = document.getElementById('liste-temps');
+    liste.innerHTML = '';
+    TEMPS.forEach(t => {
+      const prog = Profiles.getProgression('conjugaison');
+      const fait = prog && prog[t.id];
+      const btn = document.createElement('button');
+      btn.className = 'choix-btn';
+      btn.style.cssText = 'padding:16px;display:flex;align-items:center;gap:12px;text-align:left;';
+      btn.innerHTML = `<span style="font-size:1.5rem;">${t.emoji}</span>
+        <div><div style="font-weight:700;">${t.nom}</div>
+        <div style="font-size:0.78rem;opacity:0.6;">${t.exercices.length} exercices · ${fait ? '✅ déjà fait' : 'pas encore fait'}</div></div>`;
+      btn.onclick = () => choisirTemps(t.id);
+      liste.appendChild(btn);
+    });
+  }
+
+  function choisirTemps(id) {
+    tempsActuel = TEMPS.find(t => t.id === id);
+    exoIndex = 0;
+    afficherLecon();
+    Teacher.expliquer("Parfait ! On va travailler le " + tempsActuel.nom + ". Je t'explique la règle, ensuite on s'entraîne !");
+  }
+
+  function afficherLecon() {
+    document.getElementById('menu-temps').style.display = 'none';
+    document.getElementById('lecon-card').style.display = 'block';
+    document.getElementById('exo-card').style.display = 'none';
+    document.getElementById('btn-suivant').style.display = 'none';
+    document.getElementById('btn-autre-temps').style.display = 'none';
+    document.getElementById('lecon-titre').textContent = tempsActuel.emoji + ' ' + tempsActuel.nom + ' — La leçon';
+    document.getElementById('lecon-contenu').innerHTML = tempsActuel.lecon;
+  }
+
+  function commencerExercices() {
+    document.getElementById('lecon-card').style.display = 'none';
+    document.getElementById('exo-card').style.display = 'block';
+    afficherExercice();
+    Teacher.encourager("C'est parti ! Je vais t'aider à chaque étape. N'aie pas peur de te tromper, c'est comme ça qu'on apprend !");
+  }
+
+  function afficherExercice() {
+    if (exoIndex >= tempsActuel.exercices.length) {
+      document.getElementById('exo-card').innerHTML = `
+        <div style="text-align:center;padding:10px;">
+          <div style="font-size:3rem;margin-bottom:10px;">🎉</div>
+          <h2 style="color:#a5b4fc;font-size:1.3rem;margin-bottom:8px;">Bravo ! Tu as terminé le ${tempsActuel.nom} !</h2>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;">${tempsActuel.exercices.length} exercices réussis</p>
+        </div>`;
+      Profiles.saveProgression('conjugaison', { [tempsActuel.id]: true, date: new Date().toLocaleDateString() });
+      lancerConfettis();
+      document.getElementById('btn-autre-temps').style.display = 'inline-flex';
+      Teacher.encourager("Félicitations " + userName + " ! Tu as terminé tous les exercices sur le " + tempsActuel.nom + ". Tu veux travailler un autre temps ?");
+      return;
     }
-    function prochainExercice(){ei++;afficherExercice();}
-    function changerTemps(){ti++;afficherLecon(ti);Teacher.expliquer("Maintenant on passe au "+lecons[ti].temps+". Lis bien la leçon !");}
-    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
-    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
+
+    const ex = tempsActuel.exercices[exoIndex];
+    document.getElementById('exo-titre').textContent = '✍️ Complète la phrase';
+    document.getElementById('exo-compteur').textContent = (exoIndex + 1) + ' / ' + tempsActuel.exercices.length;
+    document.getElementById('exo-rappel').innerHTML = '💡 ' + ex.rappel;
+    document.getElementById('phrase-trouee').textContent = ex.phrase;
+    document.getElementById('feedback-conj').className = 'feedback';
+    document.getElementById('explication-detail').style.display = 'none';
+    document.getElementById('btn-suivant').style.display = 'none';
+
+    let html = '';
+    ex.choix.forEach(c => {
+      html += `<button class="choix-btn" onclick="verifier('${c}', this)">${c}</button>`;
+    });
+    document.getElementById('choix-conj').innerHTML = html;
+
+    Teacher.poserQuestion(ex.phrase.replace('___', '...'));
+  }
+
+  function verifier(reponse, btn) {
+    const ex = tempsActuel.exercices[exoIndex];
+    document.querySelectorAll('.choix-btn').forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback-conj');
+    const detail = document.getElementById('explication-detail');
+
+    if (reponse === ex.bonne) {
+      btn.classList.add('correct');
+      fb.textContent = '✅ ' + ex.expl_bravo;
+      fb.className = 'feedback bravo';
+      detail.style.display = 'none';
+      SFX.correct();
+      lancerConfettis();
+      document.querySelector('.teacher-emoji').style.animation = 'teacher-celebrate 0.5s ease-in-out';
+      setTimeout(() => document.querySelector('.teacher-emoji').style.animation = '', 700);
+      const lu = Profiles.addXP(10); updateHUD();
+      if (lu) { SFX.levelUp(); afficherToast(); }
+      Teacher.encourager(ex.expl_bravo);
+    } else {
+      btn.classList.add('incorrect');
+      // Montrer la bonne réponse
+      document.querySelectorAll('.choix-btn').forEach(b => {
+        if (b.textContent === ex.bonne) b.classList.add('correct');
+      });
+      fb.textContent = '❌ Pas tout à fait...';
+      fb.className = 'feedback erreur';
+      detail.innerHTML = '📖 <strong>Explication :</strong> ' + ex.expl_erreur;
+      detail.style.display = 'block';
+      SFX.incorrect();
+      Profiles.loseHeart(); updateHUD();
+      Teacher.consoler(ex.expl_erreur);
+    }
+    document.getElementById('btn-suivant').style.display = 'inline-flex';
+  }
+
+  function prochainExercice() {
+    exoIndex++;
+    afficherExercice();
+  }
+
+  function retourMenu() {
+    afficherMenu();
+    Teacher.poserQuestion("Quel temps veux-tu travailler maintenant " + userName + " ?");
+  }
+
+  function afficherToast() {
+    const t = document.createElement('div');
+    t.className = 'level-up-toast';
+    t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  function activerMicro() {
+    if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
+    Teacher.parler("Je t'écoute !", () => {
+      Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"");
+    });
+  }
+
   </script>
 </body>
 </html>

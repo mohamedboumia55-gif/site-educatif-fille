@@ -21,6 +21,7 @@
     <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
     <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
+
   <main>
     <div class="teacher-zone">
       <div id="teacher-avatar" class="avatar-idle">
@@ -30,79 +31,313 @@
           <div class="teacher-name-badge">Mme Sophie</div>
         </div>
       </div>
-      <div class="speech-bubble" id="teacher-bubble">On va identifier la nature des mots !</div>
+      <div class="speech-bubble" id="teacher-bubble">Bienvenue en grammaire !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
+
     <div class="exercice-zone">
-      <div class="exercice-card">
-        <h2>📝 Quelle est la nature de ce mot ?</h2>
-        <div class="lecon-box" id="lecon"></div>
-        <div class="mot-cible" id="mot-cible"></div>
-        <p style="text-align:center;color:rgba(255,255,255,0.4);font-style:italic;font-size:0.85rem;margin-bottom:4px;" id="phrase-contexte"></p>
-        <div class="choix-grid" id="choix-container"></div>
-        <div class="feedback" id="feedback-gram"></div>
+
+      <!-- Menu des chapitres -->
+      <div class="exercice-card" id="menu-chapitres">
+        <h2>📚 Quel chapitre veux-tu travailler ?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;" id="liste-chapitres"></div>
       </div>
-      <div style="text-align:center;">
-        <button class="btn-action btn-blue" onclick="prochainExercice()" id="btn-suivant" style="display:none;">Question suivante →</button>
+
+      <!-- Leçon -->
+      <div class="exercice-card" id="lecon-card" style="display:none;">
+        <h2 id="lecon-titre"></h2>
+        <div class="lecon-box" id="lecon-contenu"></div>
+        <div style="text-align:center;">
+          <button class="btn-action btn-green" onclick="commencerExercices()">On s'entraîne ! →</button>
+        </div>
+      </div>
+
+      <!-- Exercice -->
+      <div class="exercice-card" id="exo-card" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <h2 id="exo-titre" style="margin:0;"></h2>
+          <span id="exo-compteur" style="color:rgba(255,255,255,0.4);font-size:0.82rem;font-weight:600;"></span>
+        </div>
+        <div class="lecon-box" id="exo-rappel" style="margin-bottom:14px;font-size:0.85rem;"></div>
+        <div class="mot-cible" id="mot-cible"></div>
+        <p style="text-align:center;color:rgba(255,255,255,0.4);font-style:italic;font-size:0.85rem;margin-bottom:8px;" id="phrase-contexte"></p>
+        <div class="choix-grid" id="choix-gram"></div>
+        <div class="feedback" id="feedback-gram"></div>
+        <div class="lecon-box" id="explication-detail" style="display:none;margin-top:12px;font-size:0.88rem;"></div>
+      </div>
+
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn-action btn-green"   onclick="prochainExercice()" id="btn-suivant"     style="display:none;">Question suivante →</button>
+        <button class="btn-action btn-primary" onclick="retourMenu()"       id="btn-autre-chap"  style="display:none;">Choisir un autre chapitre →</button>
       </div>
     </div>
   </main>
+
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
-    const exercices = [
-      { mot:"chien",  phrase:"Le chien court dans le jardin.", bonne:"Nom commun",  choix:["Nom commun","Verbe","Adjectif","Article"],      lecon:"Un nom commun désigne une chose, un animal ou une personne. Ex : chat, maison, enfant." },
-      { mot:"court",  phrase:"Le chien court dans le jardin.", bonne:"Verbe",        choix:["Nom commun","Verbe","Adjectif","Préposition"],  lecon:"Un verbe exprime une action ou un état. Ex : manger, dormir, être, avoir." },
-      { mot:"Le",     phrase:"Le chien court dans le jardin.", bonne:"Article",      choix:["Adjectif","Verbe","Article","Nom commun"],      lecon:"Un article précède un nom. Ex : le, la, les, un, une, des." },
-      { mot:"petit",  phrase:"Un petit chat dort sur le canapé.", bonne:"Adjectif", choix:["Nom commun","Verbe","Adjectif","Adverbe"],       lecon:"Un adjectif qualificatif décrit un nom. Ex : grand, beau, rouge, gentil." },
-      { mot:"dans",   phrase:"Le chien court dans le jardin.", bonne:"Préposition", choix:["Article","Verbe","Adjectif","Préposition"],      lecon:"Une préposition relie des mots. Ex : dans, sur, sous, avec, pour, à, de." }
-    ];
-    let index = 0;
-    window.addEventListener('load', () => {
-      Teacher.init();
-      initProfileSystem(name => { setTimeout(() => { Teacher.encourager("Bienvenue en grammaire " + name + " ! On identifie la nature des mots. C'est parti !"); afficherExercice(0); }, 700); });
+
+  const CHAPITRES = [
+    {
+      id: "nature_mots",
+      nom: "La nature des mots",
+      emoji: "🔤",
+      lecon: `En grammaire, chaque mot a une <strong>nature</strong> (ce qu'il est).<br><br>
+<strong>Le nom</strong> désigne une personne, un animal, une chose ou une idée.<br>
+→ Nom commun : chat, maison, soleil, bonheur<br>
+→ Nom propre : Paris, Mohamed, France<br><br>
+<strong>Le verbe</strong> exprime une action ou un état.<br>
+→ courir, manger, être, avoir, sembler<br><br>
+<strong>L'adjectif qualificatif</strong> donne une information sur un nom.<br>
+→ grand, belle, rouge, content, rapide<br><br>
+<strong>L'article</strong> précède un nom. Il peut être :<br>
+→ Défini : le, la, les, l'<br>
+→ Indéfini : un, une, des<br><br>
+<strong>Le pronom</strong> remplace un nom.<br>
+→ Personnels : je, tu, il, elle, nous, vous, ils, elles<br>
+→ Possessifs : le mien, le tien, le sien<br><br>
+<strong>La préposition</strong> relie des mots entre eux.<br>
+→ dans, sur, sous, avec, pour, à, de, par, entre<br><br>
+<strong>L'adverbe</strong> modifie un verbe, un adjectif ou un autre adverbe.<br>
+→ vite, lentement, très, bien, souvent, jamais`,
+      exercices: [
+        { mot:"chien",      phrase:"Le chien court dans le jardin.",         bonne:"Nom commun",  choix:["Nom commun","Verbe","Adjectif","Article"],
+          rappel:"Un nom commun désigne un animal, une personne ou une chose de façon générale.",
+          expl_bravo:"Exact ! 'Chien' désigne un animal sans préciser lequel : c'est un nom commun.",
+          expl_erreur:"'Chien' désigne un animal en général → c'est un NOM COMMUN. Si c'était le chien d'une personne précise avec un nom ('Rex'), ce serait un nom propre." },
+        { mot:"court",      phrase:"Le chien court dans le jardin.",         bonne:"Verbe",       choix:["Nom commun","Verbe","Adjectif","Préposition"],
+          rappel:"Un verbe exprime une action. Ici, 'court' dit ce que fait le chien.",
+          expl_bravo:"Parfait ! 'Court' exprime l'action du chien → c'est bien un verbe (courir, au présent).",
+          expl_erreur:"'Court' exprime une action (le chien court) → c'est un VERBE. Le verbe dit ce que fait ou ce qu'est le sujet." },
+        { mot:"le",         phrase:"Le chien court dans le jardin.",         bonne:"Article",     choix:["Adjectif","Verbe","Article","Pronom"],
+          rappel:"Un article est un petit mot qui précède un nom : le, la, les, un, une, des.",
+          expl_bravo:"Bien joué ! 'Le' est un article défini. Il précède 'chien' pour dire qu'on parle d'un chien précis.",
+          expl_erreur:"'Le' précède le nom 'chien' → c'est un ARTICLE défini. Les articles sont : le, la, les (définis) ou un, une, des (indéfinis)." },
+        { mot:"petit",      phrase:"Un petit chat dort sur le canapé.",      bonne:"Adjectif",    choix:["Nom commun","Verbe","Adjectif","Adverbe"],
+          rappel:"Un adjectif qualificatif décrit ou précise un nom. Ici, il dit comment est le chat.",
+          expl_bravo:"Excellent ! 'Petit' décrit le chat → c'est un adjectif qualificatif. Il s'accorde avec le nom qu'il qualifie.",
+          expl_erreur:"'Petit' dit comment est le chat (sa taille) → c'est un ADJECTIF qualificatif. Un adjectif qualifie (décrit) un nom." },
+        { mot:"dans",       phrase:"Le chien court dans le jardin.",         bonne:"Préposition", choix:["Article","Verbe","Adjectif","Préposition"],
+          rappel:"Une préposition est un mot invariable qui relie des mots. Ex : dans, sur, avec, pour...",
+          expl_bravo:"Bravo ! 'Dans' est une préposition. Elle relie 'court' à 'jardin' pour indiquer un lieu.",
+          expl_erreur:"'Dans' indique où se passe l'action → c'est une PRÉPOSITION. Les prépositions courantes : à, de, dans, sur, sous, avec, pour, par, entre." },
+        { mot:"vite",       phrase:"Elle court très vite dans la forêt.",    bonne:"Adverbe",     choix:["Adjectif","Adverbe","Nom commun","Verbe"],
+          rappel:"Un adverbe modifie un verbe, un adjectif ou un autre adverbe. Il est invariable.",
+          expl_bravo:"Parfait ! 'Vite' modifie le verbe 'court' (elle court comment ? Vite.) → c'est un adverbe.",
+          expl_erreur:"'Vite' modifie le verbe 'court' → c'est un ADVERBE. Les adverbes répondent aux questions : comment ? quand ? où ? combien ?" },
+        { mot:"elle",       phrase:"Elle court très vite dans la forêt.",    bonne:"Pronom",      choix:["Nom commun","Pronom","Article","Verbe"],
+          rappel:"Un pronom remplace un nom. 'Elle' remplace une personne ou une chose féminine.",
+          expl_bravo:"Très bien ! 'Elle' remplace un nom féminin (une personne dont on a déjà parlé) → c'est un pronom personnel.",
+          expl_erreur:"'Elle' remplace un nom → c'est un PRONOM personnel. Les pronoms personnels sujets : je, tu, il, elle, nous, vous, ils, elles." },
+        { mot:"Paris",      phrase:"Marie habite à Paris depuis deux ans.",  bonne:"Nom propre",  choix:["Nom commun","Nom propre","Adjectif","Adverbe"],
+          rappel:"Un nom propre désigne une personne, un lieu ou une chose unique. Il prend une majuscule.",
+          expl_bravo:"Excellent ! 'Paris' est un nom propre (ville unique). Les noms propres prennent toujours une majuscule.",
+          expl_erreur:"'Paris' est une ville unique → c'est un NOM PROPRE. Les noms propres désignent des choses uniques : villes, pays, prénoms. Ils prennent toujours une majuscule." }
+      ]
+    },
+    {
+      id: "fonctions",
+      nom: "Les fonctions dans la phrase",
+      emoji: "🧩",
+      lecon: `Dans une phrase, chaque mot a une <strong>fonction</strong> (ce qu'il fait).<br><br>
+<strong>Le sujet</strong> : il fait l'action ou est décrit. Il répond à "Qui est-ce qui ?" ou "Qu'est-ce qui ?"<br>
+→ <u>Le chien</u> court. → Qui court ? Le chien = SUJET<br><br>
+<strong>Le verbe</strong> : le mot d'action ou d'état, il se conjugue.<br><br>
+<strong>Le complément d'objet direct (COD)</strong> : reçoit l'action directement. Répond à "Qui ?" ou "Quoi ?" après le verbe.<br>
+→ Léa mange <u>une pomme</u>. → Mange quoi ? Une pomme = COD<br><br>
+<strong>Le complément d'objet indirect (COI)</strong> : relié au verbe par une préposition (à, de...).<br>
+→ Elle parle <u>à sa maman</u>. → Parle à qui ? À sa maman = COI<br><br>
+<strong>Le complément circonstanciel</strong> : donne des informations sur les circonstances (lieu, temps, manière).<br>
+→ Il joue <u>dans le jardin</u> (lieu). → Il part <u>demain</u> (temps).`,
+      exercices: [
+        { mot:"Le chat",    phrase:"Le chat mange une souris.",              bonne:"Sujet",       choix:["Sujet","COD","COI","Complément de lieu"],
+          rappel:"Pour trouver le sujet, demande-toi : Qui est-ce qui mange ?",
+          expl_bravo:"Parfait ! 'Le chat' fait l'action de manger → c'est bien le SUJET du verbe 'mange'.",
+          expl_erreur:"Pour trouver le sujet, on demande : 'Qui est-ce qui mange ?' → Le chat ! C'est donc le SUJET." },
+        { mot:"une souris", phrase:"Le chat mange une souris.",              bonne:"COD",         choix:["Sujet","COD","COI","Attribut"],
+          rappel:"Pour trouver le COD, demande-toi : Le chat mange QUOI ?",
+          expl_bravo:"Bravo ! 'Une souris' répond à 'mange quoi ?' → c'est le COD (Complément d'Objet Direct).",
+          expl_erreur:"On demande : 'mange quoi ?' → une souris. Pas de préposition entre le verbe et ce mot → c'est le COD." },
+        { mot:"à sa maman", phrase:"Elle parle à sa maman chaque soir.",    bonne:"COI",         choix:["Sujet","COD","COI","Complément de temps"],
+          rappel:"Le COI est relié au verbe par une préposition (à, de...). Elle parle À qui ?",
+          expl_bravo:"Excellent ! 'À sa maman' répond à 'parle à qui ?' avec la préposition 'à' → c'est le COI.",
+          expl_erreur:"On demande : 'parle à qui ?' → à sa maman. Il y a une préposition 'à' → c'est un COI (Complément d'Objet Indirect)." },
+        { mot:"dans le parc",phrase:"Les enfants jouent dans le parc.",     bonne:"C. de lieu",  choix:["Sujet","COD","COI","C. de lieu"],
+          rappel:"Un complément circonstanciel de lieu répond à la question 'Où ?'.",
+          expl_bravo:"Parfait ! 'Dans le parc' répond à 'jouent où ?' → c'est un complément circonstanciel de lieu.",
+          expl_erreur:"'Dans le parc' indique l'endroit où se passe l'action → c'est un COMPLÉMENT DE LIEU. Il répond à 'Où ?'." },
+        { mot:"demain",     phrase:"Nous partirons en voyage demain.",       bonne:"C. de temps", choix:["Sujet","COD","C. de temps","Adverbe seulement"],
+          rappel:"Un complément circonstanciel de temps répond à la question 'Quand ?'.",
+          expl_bravo:"Bravo ! 'Demain' répond à 'partirons quand ?' → c'est un complément circonstanciel de temps.",
+          expl_erreur:"'Demain' indique quand se passe l'action → c'est un COMPLÉMENT DE TEMPS. Il répond à 'Quand ?'." }
+      ]
+    },
+    {
+      id: "types_phrases",
+      nom: "Types et formes de phrases",
+      emoji: "❓",
+      lecon: `Une phrase peut avoir différents <strong>types</strong> et <strong>formes</strong>.<br><br>
+<strong>Les 4 types de phrases :</strong><br>
+→ <strong>Déclarative :</strong> donne une information. Se termine par un point.<br>
+→ Le chat mange une souris.<br><br>
+→ <strong>Interrogative :</strong> pose une question. Se termine par un point d'interrogation.<br>
+→ Est-ce que le chat mange une souris ?<br><br>
+→ <strong>Exclamative :</strong> exprime un sentiment fort. Se termine par un point d'exclamation.<br>
+→ Le chat mange une souris !<br><br>
+→ <strong>Impérative :</strong> donne un ordre ou un conseil. Pas de sujet exprimé.<br>
+→ Mange ta soupe !<br><br>
+<strong>Les 2 formes :</strong><br>
+→ <strong>Affirmative :</strong> la phrase dit que quelque chose est vrai.<br>
+→ Je mange des légumes.<br><br>
+→ <strong>Négative :</strong> la phrase dit que quelque chose n'est pas vrai.<br>
+→ Je <u>ne</u> mange <u>pas</u> de légumes. (ne...pas, ne...plus, ne...jamais, ne...rien)`,
+      exercices: [
+        { mot:"Ferme la porte !",              phrase:"Ferme la porte !",                          bonne:"Impérative",    choix:["Déclarative","Interrogative","Exclamative","Impérative"],
+          rappel:"Une phrase impérative donne un ordre. Il n'y a pas de sujet et elle se termine par ! ou .",
+          expl_bravo:"Parfait ! 'Ferme la porte' est un ordre sans sujet exprimé → c'est une phrase IMPÉRATIVE.",
+          expl_erreur:"Cette phrase donne un ordre ('Ferme !') sans sujet exprimé → c'est une phrase IMPÉRATIVE." },
+        { mot:"Est-ce que tu viens ?",         phrase:"Est-ce que tu viens ?",                     bonne:"Interrogative", choix:["Déclarative","Interrogative","Exclamative","Impérative"],
+          rappel:"Une phrase interrogative pose une question. Elle se termine par un point d'interrogation.",
+          expl_bravo:"Bravo ! La phrase pose une question et se termine par '?' → c'est une phrase INTERROGATIVE.",
+          expl_erreur:"La phrase pose une question (Est-ce que...) et se termine par '?' → c'est une phrase INTERROGATIVE." },
+        { mot:"Le soleil brille aujourd'hui.", phrase:"Le soleil brille aujourd'hui.",             bonne:"Déclarative",   choix:["Déclarative","Interrogative","Exclamative","Impérative"],
+          rappel:"Une phrase déclarative donne une information. Elle se termine par un point simple.",
+          expl_bravo:"Excellent ! La phrase donne une information et se termine par '.' → c'est une phrase DÉCLARATIVE.",
+          expl_erreur:"La phrase donne une information et se termine par '.' → c'est une phrase DÉCLARATIVE." },
+        { mot:"Quelle belle journée !",        phrase:"Quelle belle journée !",                   bonne:"Exclamative",   choix:["Déclarative","Interrogative","Exclamative","Impérative"],
+          rappel:"Une phrase exclamative exprime un sentiment fort. Elle se termine par un point d'exclamation.",
+          expl_bravo:"Parfait ! La phrase exprime l'admiration et se termine par '!' → c'est une phrase EXCLAMATIVE.",
+          expl_erreur:"La phrase exprime un sentiment (admiration) et se termine par '!' → c'est une phrase EXCLAMATIVE." },
+        { mot:"Je ne mange pas de légumes.",   phrase:"Je ne mange pas de légumes.",              bonne:"Négative",      choix:["Affirmative","Négative","Interrogative","Impérative"],
+          rappel:"Une phrase négative utilise 'ne...pas', 'ne...plus', 'ne...jamais', 'ne...rien'.",
+          expl_bravo:"Bravo ! La phrase contient 'ne...pas' → c'est une phrase de forme NÉGATIVE.",
+          expl_erreur:"La phrase contient 'ne...pas' → c'est une phrase NÉGATIVE. La négation en français s'exprime avec : ne...pas, ne...plus, ne...jamais, ne...rien." },
+        { mot:"Les oiseaux chantent le matin.", phrase:"Les oiseaux chantent le matin.",          bonne:"Affirmative",   choix:["Affirmative","Négative","Interrogative","Impérative"],
+          rappel:"Une phrase affirmative dit que quelque chose est vrai, sans négation.",
+          expl_bravo:"Exact ! Il n'y a pas de négation (ne...pas) dans cette phrase → c'est une phrase AFFIRMATIVE.",
+          expl_erreur:"Pas de 'ne...pas' dans cette phrase → c'est une phrase AFFIRMATIVE. Elle dit quelque chose de positif." }
+      ]
+    }
+  ];
+
+  let chapActuel = null;
+  let exoIndex = 0;
+  let userName = '';
+
+  window.addEventListener('load', () => {
+    Teacher.init();
+    initProfileSystem(name => {
+      userName = name;
+      setTimeout(() => {
+        afficherMenu();
+        Teacher.encourager("Bonjour " + name + " ! En grammaire, on va travailler la nature des mots, les fonctions dans la phrase et les types de phrases. Quel chapitre veux-tu commencer ?");
+      }, 700);
     });
-    function afficherExercice(i) {
-      if (i >= exercices.length) {
-        document.querySelector('.exercice-card').innerHTML = '<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Bravo ! Grammaire terminée !</h2>';
-        Profiles.saveProgression('grammaire',{termine:true,date:new Date().toLocaleDateString()});
-        lancerConfettis(); Teacher.encourager("Félicitations ! Tu as terminé tous les exercices de grammaire !");
-        return;
-      }
-      const ex = exercices[i];
-      document.getElementById('mot-cible').textContent = ex.mot;
-      document.getElementById('phrase-contexte').textContent = '"' + ex.phrase + '"';
-      document.getElementById('lecon').textContent = '💡 ' + ex.lecon;
-      document.getElementById('feedback-gram').className = 'feedback';
-      document.getElementById('btn-suivant').style.display = 'none';
-      let html = '';
-      ex.choix.forEach(c => { html += `<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`; });
-      document.getElementById('choix-container').innerHTML = html;
-      Teacher.poserQuestion("Quelle est la nature du mot : " + ex.mot + " ?");
+  });
+
+  function afficherMenu() {
+    document.getElementById('menu-chapitres').style.display = 'block';
+    document.getElementById('lecon-card').style.display = 'none';
+    document.getElementById('exo-card').style.display = 'none';
+    document.getElementById('btn-suivant').style.display = 'none';
+    document.getElementById('btn-autre-chap').style.display = 'none';
+
+    const liste = document.getElementById('liste-chapitres');
+    liste.innerHTML = '';
+    CHAPITRES.forEach(c => {
+      const prog = Profiles.getProgression('grammaire');
+      const fait = prog && prog[c.id];
+      const btn = document.createElement('button');
+      btn.className = 'choix-btn';
+      btn.style.cssText = 'padding:16px;display:flex;align-items:center;gap:12px;text-align:left;';
+      btn.innerHTML = `<span style="font-size:1.5rem;">${c.emoji}</span>
+        <div><div style="font-weight:700;">${c.nom}</div>
+        <div style="font-size:0.78rem;opacity:0.6;">${c.exercices.length} exercices · ${fait ? '✅ déjà fait' : 'pas encore fait'}</div></div>`;
+      btn.onclick = () => choisirChapitre(c.id);
+      liste.appendChild(btn);
+    });
+  }
+
+  function choisirChapitre(id) {
+    chapActuel = CHAPITRES.find(c => c.id === id);
+    exoIndex = 0;
+    document.getElementById('menu-chapitres').style.display = 'none';
+    document.getElementById('lecon-card').style.display = 'block';
+    document.getElementById('lecon-titre').textContent = chapActuel.emoji + ' ' + chapActuel.nom + ' — La leçon';
+    document.getElementById('lecon-contenu').innerHTML = chapActuel.lecon;
+    Teacher.expliquer("Je t'explique " + chapActuel.nom + ". Lis bien la leçon, ensuite on s'entraîne !");
+  }
+
+  function commencerExercices() {
+    document.getElementById('lecon-card').style.display = 'none';
+    document.getElementById('exo-card').style.display = 'block';
+    afficherExercice();
+    Teacher.encourager("C'est parti ! Pour chaque question, je t'aide avec un rappel de la règle. N'hésite pas !");
+  }
+
+  function afficherExercice() {
+    if (exoIndex >= chapActuel.exercices.length) {
+      document.getElementById('exo-card').innerHTML = `
+        <div style="text-align:center;padding:10px;">
+          <div style="font-size:3rem;margin-bottom:10px;">🎉</div>
+          <h2 style="color:#a5b4fc;font-size:1.3rem;margin-bottom:8px;">Bravo ! Tu as terminé ${chapActuel.nom} !</h2>
+        </div>`;
+      Profiles.saveProgression('grammaire', { [chapActuel.id]: true, date: new Date().toLocaleDateString() });
+      lancerConfettis();
+      document.getElementById('btn-autre-chap').style.display = 'inline-flex';
+      Teacher.encourager("Excellent " + userName + " ! Tu as terminé tous les exercices. Tu veux travailler un autre chapitre ?");
+      return;
     }
-    function verifier(rep, bonne, btn) {
-      document.querySelectorAll('.choix-btn').forEach(b => b.disabled=true);
-      const fb = document.getElementById('feedback-gram');
-      if (rep === bonne) {
-        btn.classList.add('correct'); fb.textContent='✅ Excellent ! "'+bonne+'", c\'est juste !'; fb.className='feedback bravo';
-        SFX.correct(); lancerConfettis();
-        document.querySelector('.teacher-emoji').style.animation='teacher-celebrate 0.5s ease-in-out';
-        setTimeout(()=>document.querySelector('.teacher-emoji').style.animation='',600);
-        const lu=Profiles.addXP(10); updateHUD();
-        if(lu){SFX.levelUp();afficherToast();}
-        Teacher.encourager("Excellent ! "+bonne+" c'est la bonne réponse. Bravo !");
-      } else {
-        btn.classList.add('incorrect');
-        document.querySelectorAll('.choix-btn')[exercices[index].choix.indexOf(bonne)].classList.add('correct');
-        fb.textContent='❌ Pas tout à fait. C\'est un '+bonne; fb.className='feedback erreur';
-        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
-        Teacher.consoler("Pas tout à fait. Ce mot est un "+bonne+". Retiens bien !");
-      }
-      document.getElementById('btn-suivant').style.display='inline-flex';
+    const ex = chapActuel.exercices[exoIndex];
+    document.getElementById('exo-titre').textContent = '📝 ' + chapActuel.nom;
+    document.getElementById('exo-compteur').textContent = (exoIndex + 1) + ' / ' + chapActuel.exercices.length;
+    document.getElementById('exo-rappel').innerHTML = '💡 ' + ex.rappel;
+    document.getElementById('mot-cible').textContent = ex.mot;
+    document.getElementById('phrase-contexte').textContent = '"' + ex.phrase + '"';
+    document.getElementById('feedback-gram').className = 'feedback';
+    document.getElementById('explication-detail').style.display = 'none';
+    document.getElementById('btn-suivant').style.display = 'none';
+
+    let html = '';
+    ex.choix.forEach(c => { html += `<button class="choix-btn" onclick="verifier('${c}',this)">${c}</button>`; });
+    document.getElementById('choix-gram').innerHTML = html;
+    Teacher.poserQuestion("Dans la phrase : " + ex.phrase + " — quelle est la nature ou la fonction de : " + ex.mot + " ?");
+  }
+
+  function verifier(rep, btn) {
+    const ex = chapActuel.exercices[exoIndex];
+    document.querySelectorAll('.choix-btn').forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback-gram');
+    const detail = document.getElementById('explication-detail');
+
+    if (rep === ex.bonne) {
+      btn.classList.add('correct');
+      fb.textContent = '✅ ' + ex.expl_bravo;
+      fb.className = 'feedback bravo';
+      detail.style.display = 'none';
+      SFX.correct(); lancerConfettis();
+      document.querySelector('.teacher-emoji').style.animation = 'teacher-celebrate 0.5s ease-in-out';
+      setTimeout(() => document.querySelector('.teacher-emoji').style.animation = '', 700);
+      const lu = Profiles.addXP(10); updateHUD();
+      if (lu) { SFX.levelUp(); afficherToast(); }
+      Teacher.encourager(ex.expl_bravo);
+    } else {
+      btn.classList.add('incorrect');
+      document.querySelectorAll('.choix-btn').forEach(b => { if (b.textContent === ex.bonne) b.classList.add('correct'); });
+      fb.textContent = '❌ Pas tout à fait...';
+      fb.className = 'feedback erreur';
+      detail.innerHTML = '📖 <strong>Explication :</strong> ' + ex.expl_erreur;
+      detail.style.display = 'block';
+      SFX.incorrect(); Profiles.loseHeart(); updateHUD();
+      Teacher.consoler(ex.expl_erreur);
     }
-    function prochainExercice(){index++;afficherExercice(index);}
-    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
-    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
+    document.getElementById('btn-suivant').style.display = 'inline-flex';
+  }
+
+  function prochainExercice() { exoIndex++; afficherExercice(); }
+  function retourMenu() { afficherMenu(); Teacher.poserQuestion("Quel chapitre veux-tu travailler maintenant " + userName + " ?"); }
+  function afficherToast() { const t = document.createElement('div'); t.className = 'level-up-toast'; t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !'; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
+  function activerMicro() { if (Teacher.isListening) { Teacher.arreterEcoute(); return; } Teacher.parler("Je t'écoute !", () => { Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\""); }); }
   </script>
 </body>
 </html>
