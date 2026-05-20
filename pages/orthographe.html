@@ -7,231 +7,103 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-
   <header class="hud">
     <div class="hud-top">
       <a href="../index.html" class="hud-back">←</a>
       <div class="hud-title">🔡 Orthographe</div>
       <div class="hud-stats">
-        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
-        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
-        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <span class="stat-chip">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-chip">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-chip" id="hud-hearts">❤️❤️❤️❤️❤️</span>
         <button class="btn-logout" onclick="Profiles.logout()">🔄</button>
       </div>
     </div>
-    <div class="xp-label">
-      <span id="user-name-display"></span>
-      <span>Niv. <span id="hud-level">1</span></span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
+    <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
+    <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
-
   <main>
     <div class="teacher-zone">
-      <div id="teacher-avatar" class="avatar-idle">🦉</div>
+      <div id="teacher-avatar" class="avatar-idle">
+        <div class="teacher-frame">
+          <div class="teacher-ring"></div>
+          <div class="teacher-emoji">👩‍🏫</div>
+          <div class="teacher-name-badge">Mme Sophie</div>
+        </div>
+      </div>
       <div class="speech-bubble" id="teacher-bubble">Entraînons-nous à l'orthographe !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
-
     <div class="exercice-zone">
       <div class="exercice-card" id="choix-mode-card">
         <h2>Que veux-tu faire ?</h2>
         <div class="choix-grid" style="margin-top:12px;">
-          <button class="choix-btn" onclick="demarrerDictee()" style="padding:20px;flex-direction:column;gap:6px;">
-            <span style="font-size:1.8rem;">🎙️</span>
-            <span>Dictée vocale</span>
-            <small style="font-weight:400;font-size:0.82rem;opacity:0.75;">J'écoute et j'écris</small>
+          <button class="choix-btn" onclick="demarrerDictee()" style="padding:22px;display:flex;flex-direction:column;gap:6px;align-items:center;">
+            <span style="font-size:2rem;">🎙️</span><span>Dictée vocale</span>
+            <small style="font-weight:400;font-size:0.78rem;opacity:0.6;">J'écoute et j'écris</small>
           </button>
-          <button class="choix-btn" onclick="demarrerOrthographe()" style="padding:20px;flex-direction:column;gap:6px;">
-            <span style="font-size:1.8rem;">✅</span>
-            <span>Bonne orthographe</span>
-            <small style="font-weight:400;font-size:0.82rem;opacity:0.75;">Je choisis la bonne</small>
+          <button class="choix-btn" onclick="demarrerOrthographe()" style="padding:22px;display:flex;flex-direction:column;gap:6px;align-items:center;">
+            <span style="font-size:2rem;">✅</span><span>Bonne orthographe</span>
+            <small style="font-weight:400;font-size:0.78rem;opacity:0.6;">Je choisis la bonne</small>
           </button>
         </div>
       </div>
-
       <div class="exercice-card" id="dictee-card" style="display:none;">
         <h2>🎙️ Dictée</h2>
-        <div class="lecon-box" id="dictee-indice" style="margin-bottom:14px;text-align:center;"></div>
+        <div class="lecon-box" id="dictee-indice" style="text-align:center;margin-bottom:14px;"></div>
         <div style="text-align:center;margin-bottom:14px;">
-          <button class="valider-btn blue" onclick="pronouncerMot()">🔊 Écouter le mot</button>
+          <button class="btn-action btn-blue" onclick="pronouncerMot()">🔊 Écouter le mot</button>
         </div>
         <input type="text" class="reponse-input" id="dictee-input" placeholder="Écris le mot ici..." autocomplete="off" autocorrect="off" spellcheck="false">
         <div style="text-align:center;margin-top:10px;">
-          <button class="valider-btn" onclick="verifierDictee()">Vérifier ✓</button>
+          <button class="btn-action btn-primary" onclick="verifierDictee()">Vérifier ✓</button>
         </div>
         <div class="feedback" id="feedback-dictee"></div>
         <div style="text-align:center;margin-top:10px;">
-          <button class="valider-btn green" onclick="prochainMot()" id="btn-mot-suivant" style="display:none;">Mot suivant ➜</button>
+          <button class="btn-action btn-green" onclick="prochainMot()" id="btn-mot-suivant" style="display:none;">Mot suivant →</button>
         </div>
       </div>
-
       <div class="exercice-card" id="ortho-card" style="display:none;">
         <h2>✅ Quelle est la bonne orthographe ?</h2>
-        <p style="font-size:1.02rem;color:#374151;font-weight:700;margin-bottom:16px;" id="ortho-definition"></p>
+        <p style="font-size:1rem;color:rgba(255,255,255,0.85);font-weight:600;margin-bottom:16px;" id="ortho-definition"></p>
         <div class="choix-grid" id="choix-ortho"></div>
         <div class="feedback" id="feedback-ortho"></div>
         <div style="text-align:center;margin-top:10px;">
-          <button class="valider-btn green" onclick="prochainOrtho()" id="btn-ortho-suivant" style="display:none;">Question suivante ➜</button>
+          <button class="btn-action btn-green" onclick="prochainOrtho()" id="btn-ortho-suivant" style="display:none;">Question suivante →</button>
         </div>
       </div>
     </div>
   </main>
-
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
-    const motsDictee = [
-      { mot:"papillon",     phrase:"Un beau papillon vole dans le jardin.",   indice:"🦋 Un insecte coloré avec de grandes ailes" },
-      { mot:"bouteille",    phrase:"Remplis la bouteille d'eau.",              indice:"🍶 Un récipient pour mettre des liquides" },
-      { mot:"parapluie",    phrase:"Prends ton parapluie, il pleut.",          indice:"☂️ On l'ouvre pour se protéger de la pluie" },
-      { mot:"grenouille",   phrase:"La grenouille saute dans la mare.",        indice:"🐸 Un amphibien vert qui fait coâ coâ" },
-      { mot:"printemps",    phrase:"Les fleurs poussent au printemps.",        indice:"🌸 La saison après l'hiver" },
-      { mot:"bibliothèque", phrase:"Je lis à la bibliothèque.",                indice:"📚 Un endroit avec beaucoup de livres" }
+    const motsDictee=[
+      {mot:"papillon",    phrase:"Un beau papillon vole dans le jardin.",  indice:"🦋 Un insecte coloré avec de grandes ailes"},
+      {mot:"bouteille",   phrase:"Remplis la bouteille d'eau.",             indice:"🍶 Un récipient pour mettre des liquides"},
+      {mot:"parapluie",   phrase:"Prends ton parapluie, il pleut.",         indice:"☂️ On l'ouvre sous la pluie"},
+      {mot:"grenouille",  phrase:"La grenouille saute dans la mare.",       indice:"🐸 Un amphibien vert : coâ coâ !"},
+      {mot:"printemps",   phrase:"Les fleurs poussent au printemps.",       indice:"🌸 La saison après l'hiver"},
+      {mot:"bibliothèque",phrase:"Je lis à la bibliothèque.",               indice:"📚 Un endroit avec beaucoup de livres"}
     ];
-
-    const exercicesOrtho = [
-      { definition:"Quel est le bon pluriel de 'cheval' ?", bonne:"chevaux", choix:["chevals","chevaux","chevales","cheval"], explication:"Les mots en -al font leur pluriel en -aux : cheval → chevaux." },
-      { definition:"Complète : Elle s'est ___ les mains.", bonne:"lavé", choix:["lavée","lavé","lavés","laver"], explication:"Le participe passé s'accorde avec le COD seulement si celui-ci est placé avant." },
-      { definition:"Quel mot s'écrit correctement ?", bonne:"accueil", choix:["acueil","accueil","acueill","accueille"], explication:"Accueil s'écrit avec deux c et un seul l." },
-      { definition:"Combien de 'vingts' dans 'quatre-vingts' ?", bonne:"vingt", choix:["vint","vingt","ving","vingts"], explication:"Vingt prend un t muet quand il est seul ou multiplié sans être suivi d'un autre nombre." }
+    const exercicesOrtho=[
+      {definition:"Quel est le bon pluriel de 'cheval' ?",bonne:"chevaux",choix:["chevals","chevaux","chevales","cheval"],explication:"Les mots en -al font leur pluriel en -aux : cheval → chevaux."},
+      {definition:"Complète : Elle s'est ___ les mains.",bonne:"lavé",choix:["lavée","lavé","lavés","laver"],explication:"Le participe s'accorde avec le COD seulement s'il est placé avant."},
+      {definition:"Quel mot s'écrit correctement ?",bonne:"accueil",choix:["acueil","accueil","acueill","accueil"],explication:"Accueil s'écrit avec deux c : a-c-c-u-e-i-l."},
+      {definition:"Complète : Il y a ___ élèves dans la classe.",bonne:"vingt",choix:["vint","vingt","ving","vingts"],explication:"Vingt prend un t muet quand il est seul ou multiplié."}
     ];
-
-    let dicteeIndex = 0, orthoIndex = 0;
-
-    window.addEventListener('load', () => {
-      Teacher.init();
-      initProfileSystem((name) => {
-        setTimeout(() => {
-          Teacher.poserQuestion("Bienvenue en orthographe " + name + " ! Tu préfères une dictée ou choisir la bonne orthographe ?");
-        }, 700);
-      });
-    });
-
-    function demarrerDictee() {
-      document.getElementById('choix-mode-card').style.display = 'none';
-      document.getElementById('dictee-card').style.display = 'block';
-      dicteeIndex = 0; afficherMot();
-      Teacher.expliquer("Je vais te dire un mot et tu vas l'écrire dans la case. Clique sur 'Écouter le mot' pour l'entendre !");
-    }
-
-    function afficherMot() {
-      if (dicteeIndex >= motsDictee.length) {
-        document.getElementById('dictee-card').innerHTML = '<h2 style="text-align:center;color:#7c3aed">🎉 Dictée terminée ! Bravo !</h2>';
-        Profiles.saveProgression('orthographe', { dictee: true, date: new Date().toLocaleDateString() });
-        lancerConfettis();
-        Teacher.encourager("Félicitations ! Tu as réussi toute la dictée. Tu es vraiment courageuse !");
-        return;
-      }
-      const m = motsDictee[dicteeIndex];
-      document.getElementById('dictee-indice').textContent = m.indice;
-      document.getElementById('dictee-input').value = '';
-      document.getElementById('feedback-dictee').className = 'feedback';
-      document.getElementById('btn-mot-suivant').style.display = 'none';
-      setTimeout(() => document.getElementById('dictee-input').focus(), 100);
-    }
-
-    function pronouncerMot() {
-      const m = motsDictee[dicteeIndex];
-      Teacher.expliquer("Le mot est : " + m.mot + ". " + m.mot + ". Dans une phrase : " + m.phrase);
-    }
-
-    function verifierDictee() {
-      const input = document.getElementById('dictee-input').value.trim().toLowerCase();
-      const bonne = motsDictee[dicteeIndex].mot.toLowerCase();
-      const fb = document.getElementById('feedback-dictee');
-      if (input === bonne) {
-        fb.textContent = '✅ Parfait ! Tu as bien écrit : ' + motsDictee[dicteeIndex].mot;
-        fb.className = 'feedback bravo';
-        SFX.correct(); lancerConfettis();
-        document.getElementById('teacher-avatar').className = 'avatar-celebrate';
-        setTimeout(() => document.getElementById('teacher-avatar').className = 'avatar-idle', 600);
-        const levelUp = Profiles.addXP(10); updateHUD();
-        if (levelUp) { SFX.levelUp(); afficherToast(); }
-        Teacher.encourager("Parfait ! Tu as très bien écrit le mot " + motsDictee[dicteeIndex].mot + " !");
-      } else {
-        fb.textContent = '❌ Le mot s\'écrit : ' + motsDictee[dicteeIndex].mot;
-        fb.className = 'feedback erreur';
-        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
-        Teacher.consoler("Pas tout à fait. Le mot s'écrit : " + motsDictee[dicteeIndex].mot + ". On continue !");
-      }
-      document.getElementById('btn-mot-suivant').style.display = 'inline-block';
-    }
-
-    function prochainMot() { dicteeIndex++; afficherMot(); }
-
-    function demarrerOrthographe() {
-      document.getElementById('choix-mode-card').style.display = 'none';
-      document.getElementById('ortho-card').style.display = 'block';
-      orthoIndex = 0; afficherOrtho();
-      Teacher.poserQuestion("Choisis la bonne orthographe parmi les propositions !");
-    }
-
-    function afficherOrtho() {
-      if (orthoIndex >= exercicesOrtho.length) {
-        document.getElementById('ortho-card').innerHTML = '<h2 style="text-align:center;color:#7c3aed">🎉 Bravo ! Tu as terminé tous les exercices !</h2>';
-        Profiles.saveProgression('orthographe', { exercices: true, date: new Date().toLocaleDateString() });
-        lancerConfettis();
-        Teacher.encourager("Excellent travail ! Tu as terminé tous les exercices d'orthographe !");
-        return;
-      }
-      const ex = exercicesOrtho[orthoIndex];
-      document.getElementById('ortho-definition').textContent = ex.definition;
-      document.getElementById('feedback-ortho').className = 'feedback';
-      document.getElementById('btn-ortho-suivant').style.display = 'none';
-      let html = '';
-      ex.choix.forEach(c => { html += `<button class="choix-btn" onclick="verifierOrtho('${c}',this)">${c}</button>`; });
-      document.getElementById('choix-ortho').innerHTML = html;
-      Teacher.poserQuestion(ex.definition);
-    }
-
-    function verifierOrtho(reponse, btn) {
-      const ex = exercicesOrtho[orthoIndex];
-      const btns = document.querySelectorAll('#choix-ortho .choix-btn');
-      btns.forEach(b => b.disabled = true);
-      const fb = document.getElementById('feedback-ortho');
-      if (reponse === ex.bonne) {
-        btn.classList.add('correct');
-        fb.textContent = '✅ Bravo ! ' + ex.explication;
-        fb.className = 'feedback bravo';
-        SFX.correct(); lancerConfettis();
-        document.getElementById('teacher-avatar').className = 'avatar-celebrate';
-        setTimeout(() => document.getElementById('teacher-avatar').className = 'avatar-idle', 600);
-        const levelUp = Profiles.addXP(10); updateHUD();
-        if (levelUp) { SFX.levelUp(); afficherToast(); }
-        Teacher.encourager("Bravo ! " + ex.explication);
-      } else {
-        btn.classList.add('incorrect');
-        btns[ex.choix.indexOf(ex.bonne)].classList.add('correct');
-        fb.textContent = '❌ La bonne orthographe est : ' + ex.bonne + '. ' + ex.explication;
-        fb.className = 'feedback erreur';
-        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
-        Teacher.consoler("La bonne réponse était : " + ex.bonne + ". " + ex.explication);
-      }
-      document.getElementById('btn-ortho-suivant').style.display = 'inline-block';
-    }
-
-    function prochainOrtho() { orthoIndex++; afficherOrtho(); }
-
-    function afficherToast() {
-      const t = document.createElement('div');
-      t.className = 'level-up-toast';
-      t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3200);
-    }
-
-    function activerMicro() {
-      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
-      Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"");
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const i = document.getElementById('dictee-input');
-      if (i) i.addEventListener('keypress', e => { if (e.key === 'Enter') verifierDictee(); });
-    });
+    let di=0, oi=0;
+    window.addEventListener('load',()=>{Teacher.init();initProfileSystem(name=>{setTimeout(()=>Teacher.poserQuestion("Bienvenue en orthographe "+name+" ! Tu préfères une dictée ou choisir la bonne orthographe ?"),700);});});
+    function demarrerDictee(){document.getElementById('choix-mode-card').style.display='none';document.getElementById('dictee-card').style.display='block';di=0;afficherMot();Teacher.expliquer("Je vais te dire un mot, et tu vas l'écrire. Clique sur Écouter pour l'entendre !");}
+    function afficherMot(){if(di>=motsDictee.length){document.getElementById('dictee-card').innerHTML='<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Dictée terminée ! Bravo !</h2>';Profiles.saveProgression('orthographe',{dictee:true,date:new Date().toLocaleDateString()});lancerConfettis();Teacher.encourager("Félicitations ! Tu as réussi toute la dictée !");return;}const m=motsDictee[di];document.getElementById('dictee-indice').textContent=m.indice;document.getElementById('dictee-input').value='';document.getElementById('feedback-dictee').className='feedback';document.getElementById('btn-mot-suivant').style.display='none';setTimeout(()=>document.getElementById('dictee-input').focus(),100);}
+    function pronouncerMot(){const m=motsDictee[di];Teacher.expliquer("Le mot est : "+m.mot+". "+m.mot+". Dans une phrase : "+m.phrase);}
+    function verifierDictee(){const v=document.getElementById('dictee-input').value.trim().toLowerCase(),b=motsDictee[di].mot.toLowerCase(),fb=document.getElementById('feedback-dictee');if(v===b){fb.textContent='✅ Parfait ! Tu as bien écrit : '+motsDictee[di].mot;fb.className='feedback bravo';SFX.correct();lancerConfettis();const lu=Profiles.addXP(10);updateHUD();if(lu){SFX.levelUp();afficherToast();}Teacher.encourager("Parfait ! Tu as très bien écrit "+motsDictee[di].mot+" !");}else{fb.textContent='❌ Le mot s\'écrit : '+motsDictee[di].mot;fb.className='feedback erreur';SFX.incorrect();Profiles.loseHeart();updateHUD();Teacher.consoler("Pas tout à fait. Ce mot s'écrit : "+motsDictee[di].mot+". On continue !");}document.getElementById('btn-mot-suivant').style.display='inline-flex';}
+    function prochainMot(){di++;afficherMot();}
+    function demarrerOrthographe(){document.getElementById('choix-mode-card').style.display='none';document.getElementById('ortho-card').style.display='block';oi=0;afficherOrtho();Teacher.poserQuestion("Choisis la bonne orthographe parmi les propositions !");}
+    function afficherOrtho(){if(oi>=exercicesOrtho.length){document.getElementById('ortho-card').innerHTML='<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Bravo ! Tous les exercices terminés !</h2>';Profiles.saveProgression('orthographe',{exercices:true,date:new Date().toLocaleDateString()});lancerConfettis();Teacher.encourager("Excellent ! Tu as terminé tous les exercices d'orthographe !");return;}const ex=exercicesOrtho[oi];document.getElementById('ortho-definition').textContent=ex.definition;document.getElementById('feedback-ortho').className='feedback';document.getElementById('btn-ortho-suivant').style.display='none';let html='';ex.choix.forEach(c=>{html+=`<button class="choix-btn" onclick="verifierOrtho('${c}',this)">${c}</button>`;});document.getElementById('choix-ortho').innerHTML=html;Teacher.poserQuestion(ex.definition);}
+    function verifierOrtho(rep,btn){const ex=exercicesOrtho[oi];const btns=document.querySelectorAll('#choix-ortho .choix-btn');btns.forEach(b=>b.disabled=true);const fb=document.getElementById('feedback-ortho');if(rep===ex.bonne){btn.classList.add('correct');fb.textContent='✅ Bravo ! '+ex.explication;fb.className='feedback bravo';SFX.correct();lancerConfettis();const lu=Profiles.addXP(10);updateHUD();if(lu){SFX.levelUp();afficherToast();}Teacher.encourager("Bravo ! "+ex.explication);}else{btn.classList.add('incorrect');btns[ex.choix.indexOf(ex.bonne)].classList.add('correct');fb.textContent='❌ La bonne orthographe est : '+ex.bonne+'. '+ex.explication;fb.className='feedback erreur';SFX.incorrect();Profiles.loseHeart();updateHUD();Teacher.consoler("La bonne réponse était : "+ex.bonne+". "+ex.explication);}document.getElementById('btn-ortho-suivant').style.display='inline-flex';}
+    function prochainOrtho(){oi++;afficherOrtho();}
+    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
+    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
+    window.addEventListener('DOMContentLoaded',()=>{const i=document.getElementById('dictee-input');if(i)i.addEventListener('keypress',e=>{if(e.key==='Enter')verifierDictee();});});
   </script>
 </body>
 </html>

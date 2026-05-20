@@ -7,154 +7,105 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-
   <header class="hud">
     <div class="hud-top">
       <a href="../index.html" class="hud-back">←</a>
       <div class="hud-title">📖 Lecture</div>
       <div class="hud-stats">
-        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
-        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
-        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <span class="stat-chip">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-chip">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-chip" id="hud-hearts">❤️❤️❤️❤️❤️</span>
         <button class="btn-logout" onclick="Profiles.logout()">🔄</button>
       </div>
     </div>
-    <div class="xp-label">
-      <span id="user-name-display"></span>
-      <span>Niv. <span id="hud-level">1</span></span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
+    <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
+    <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
-
   <main>
     <div class="teacher-zone">
-      <div id="teacher-avatar" class="avatar-idle">🦉</div>
+      <div id="teacher-avatar" class="avatar-idle">
+        <div class="teacher-frame">
+          <div class="teacher-ring"></div>
+          <div class="teacher-emoji">👩‍🏫</div>
+          <div class="teacher-name-badge">Mme Sophie</div>
+        </div>
+      </div>
       <div class="speech-bubble" id="teacher-bubble">Je vais te lire un texte. Écoute bien !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
-
     <div class="exercice-zone">
       <div class="exercice-card">
         <h2>📄 Le texte du jour</h2>
-        <p id="texte-lecture" style="line-height:1.9;font-size:1.03rem;color:#374151;">
+        <p class="texte-lecture" id="texte-lecture">
           Un matin, Léa se leva très tôt. Le soleil n'était pas encore levé, mais elle entendit un bruit bizarre dans le jardin. Elle regarda par la fenêtre et vit un petit hérisson qui cherchait de la nourriture. Léa descendit doucement pour ne pas l'effrayer. Elle posa quelques morceaux de pomme sur le sol. Le hérisson s'approcha lentement, renifla, puis mangea. Léa était ravie.
         </p>
         <div style="text-align:center;margin-top:16px;">
-          <button class="valider-btn" onclick="lireTexte()">🔊 Lire le texte à voix haute</button>
+          <button class="btn-action btn-primary" onclick="lireTexte()">🔊 Lire le texte</button>
         </div>
       </div>
-
       <div class="exercice-card" id="zone-questions" style="display:none;">
         <h2>❓ Questions de compréhension</h2>
         <div id="question-container"></div>
         <div class="feedback" id="feedback-lecture"></div>
       </div>
-
       <div style="text-align:center;">
-        <button class="valider-btn green" onclick="window.location.href='../index.html'" id="btn-suivant" style="display:none;">
-          Retour à l'accueil ➜
-        </button>
+        <button class="btn-action btn-green" onclick="window.location.href='../index.html'" id="btn-suivant" style="display:none;">Retour à l'accueil →</button>
       </div>
     </div>
   </main>
-
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
     const texte = "Un matin, Léa se leva très tôt. Le soleil n'était pas encore levé, mais elle entendit un bruit bizarre dans le jardin. Elle regarda par la fenêtre et vit un petit hérisson qui cherchait de la nourriture. Léa descendit doucement pour ne pas l'effrayer. Elle posa quelques morceaux de pomme sur le sol. Le hérisson s'approcha lentement, renifla, puis mangea. Léa était ravie.";
-
     const questions = [
-      { question:"Qu'est-ce que Léa a entendu le matin ?", choix:["Un chien qui aboyait","Un bruit bizarre dans le jardin","La pluie qui tombait","Sa maman qui chantait"], bonne:1 },
-      { question:"Quel animal Léa a-t-elle vu ?", choix:["Un lapin","Un chat","Un hérisson","Un écureuil"], bonne:2 },
-      { question:"Qu'est-ce que Léa a posé sur le sol ?", choix:["Du pain","Des morceaux de pomme","Du lait","Des graines"], bonne:1 }
+      {question:"Qu'est-ce que Léa a entendu ?",choix:["Un chien","Un bruit bizarre dans le jardin","La pluie","Sa maman"],bonne:1},
+      {question:"Quel animal a-t-elle vu ?",choix:["Un lapin","Un chat","Un hérisson","Un écureuil"],bonne:2},
+      {question:"Qu'a-t-elle posé sur le sol ?",choix:["Du pain","Des morceaux de pomme","Du lait","Des graines"],bonne:1}
     ];
-
-    let questionIndex = 0;
-
+    let qi = 0;
     window.addEventListener('load', () => {
       Teacher.init();
-      initProfileSystem((name) => {
-        setTimeout(() => {
-          Teacher.expliquer("Bienvenue dans la lecture " + name + " ! Je vais te lire un texte. Écoute bien, ensuite je te poserai des questions !");
-        }, 700);
-      });
+      initProfileSystem(name => { setTimeout(()=>Teacher.expliquer("Bienvenue en lecture "+name+" ! Je vais lire un texte. Écoute bien, ensuite je te pose des questions !"), 700); });
     });
-
     function lireTexte() {
-      document.getElementById('teacher-bubble').textContent = "Je lis le texte...";
       Teacher.expliquer(texte, () => {
-        document.getElementById('zone-questions').style.display = 'block';
-        afficherQuestion(0);
-        Teacher.poserQuestion("Maintenant réponds à mes questions !");
+        document.getElementById('zone-questions').style.display='block';
+        afficherQuestion(0); Teacher.poserQuestion("Maintenant réponds à mes questions !");
       });
     }
-
     function afficherQuestion(i) {
       if (i >= questions.length) {
-        document.getElementById('question-container').innerHTML = '<p style="font-size:1.1rem;font-weight:800;color:#065f46;text-align:center;">🎉 Tu as répondu à toutes les questions !</p>';
-        document.getElementById('btn-suivant').style.display = 'inline-block';
-        Profiles.saveProgression('lecture', { termine: true, date: new Date().toLocaleDateString() });
-        lancerConfettis();
-        Teacher.encourager("Excellent travail ! Tu as répondu à toutes les questions. Tu es vraiment courageuse !");
+        document.getElementById('question-container').innerHTML='<p style="font-size:1.05rem;font-weight:700;color:#6ee7b7;text-align:center;">🎉 Tu as répondu à toutes les questions !</p>';
+        document.getElementById('btn-suivant').style.display='inline-flex';
+        Profiles.saveProgression('lecture',{termine:true,date:new Date().toLocaleDateString()});
+        lancerConfettis(); Teacher.encourager("Excellent ! Tu as répondu à toutes les questions. Tu es vraiment courageuse !");
         return;
       }
-      const q = questions[i];
-      document.getElementById('feedback-lecture').className = 'feedback';
-      let html = `<p style="font-weight:800;margin-bottom:14px;font-size:1.02rem;">${q.question}</p><div class="choix-grid">`;
-      q.choix.forEach((c, idx) => {
-        html += `<button class="choix-btn" onclick="verifier(${idx},${q.bonne},this)">${c}</button>`;
-      });
-      html += '</div>';
-      document.getElementById('question-container').innerHTML = html;
+      document.getElementById('feedback-lecture').className='feedback';
+      const q=questions[i];
+      let html=`<p style="font-weight:700;margin-bottom:14px;font-size:0.98rem;color:rgba(255,255,255,0.9);">${q.question}</p><div class="choix-grid">`;
+      q.choix.forEach((c,idx)=>{ html+=`<button class="choix-btn" onclick="verifier(${idx},${q.bonne},this)">${c}</button>`; });
+      html+='</div>';
+      document.getElementById('question-container').innerHTML=html;
       Teacher.poserQuestion(q.question);
     }
-
     function verifier(idx, bonne, btn) {
-      document.querySelectorAll('.choix-btn').forEach(b => b.disabled = true);
-      const fb = document.getElementById('feedback-lecture');
-      if (idx === bonne) {
-        btn.classList.add('correct');
-        fb.textContent = '✅ Bravo ! C\'est la bonne réponse !';
-        fb.className = 'feedback bravo';
-        SFX.correct();
-        lancerConfettis();
-        document.getElementById('teacher-avatar').className = 'avatar-celebrate';
-        setTimeout(() => document.getElementById('teacher-avatar').className = 'avatar-idle', 600);
-        const levelUp = Profiles.addXP(10);
-        updateHUD();
-        if (levelUp) { SFX.levelUp(); afficherToast(); }
-        Teacher.encourager("Bravo ! C'est la bonne réponse !", () => {
-          questionIndex++;
-          setTimeout(() => afficherQuestion(questionIndex), 800);
-        });
+      document.querySelectorAll('.choix-btn').forEach(b=>b.disabled=true);
+      const fb=document.getElementById('feedback-lecture');
+      if (idx===bonne) {
+        btn.classList.add('correct'); fb.textContent='✅ Bravo ! C\'est la bonne réponse !'; fb.className='feedback bravo';
+        SFX.correct(); lancerConfettis();
+        const lu=Profiles.addXP(10); updateHUD(); if(lu){SFX.levelUp();afficherToast();}
+        Teacher.encourager("Bravo ! C'est la bonne réponse !", ()=>{ qi++; setTimeout(()=>afficherQuestion(qi),800); });
       } else {
-        btn.classList.add('incorrect');
-        document.querySelectorAll('.choix-btn')[bonne].classList.add('correct');
-        fb.textContent = '❌ Pas tout à fait. La bonne réponse : ' + questions[questionIndex].choix[bonne];
-        fb.className = 'feedback erreur';
-        SFX.incorrect();
-        Profiles.loseHeart(); updateHUD();
-        Teacher.consoler("Pas tout à fait. La bonne réponse était : " + questions[questionIndex].choix[bonne], () => {
-          questionIndex++;
-          setTimeout(() => afficherQuestion(questionIndex), 1200);
-        });
+        btn.classList.add('incorrect'); document.querySelectorAll('.choix-btn')[bonne].classList.add('correct');
+        fb.textContent='❌ La bonne réponse : '+questions[qi].choix[bonne]; fb.className='feedback erreur';
+        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
+        Teacher.consoler("Pas tout à fait. La réponse était : "+questions[qi].choix[bonne], ()=>{ qi++; setTimeout(()=>afficherQuestion(qi),1200); });
       }
     }
-
-    function afficherToast() {
-      const t = document.createElement('div');
-      t.className = 'level-up-toast';
-      t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3200);
-    }
-
-    function activerMicro() {
-      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
-      Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"");
-      });
-    }
+    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
+    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
   </script>
 </body>
 </html>

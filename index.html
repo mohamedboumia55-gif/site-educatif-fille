@@ -3,36 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L'école magique 🦉</title>
+  <title>L'école magique</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
   <header class="hud">
     <div class="hud-top">
-      <div class="hud-title">📚 L'école magique</div>
+      <div class="hud-title">🎓 L'école magique</div>
       <div class="hud-stats">
-        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
-        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
-        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <span class="stat-chip">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-chip">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-chip" id="hud-hearts">❤️❤️❤️❤️❤️</span>
         <button class="btn-logout" onclick="Profiles.logout()" title="Changer">🔄</button>
       </div>
     </div>
-    <div class="xp-label">
-      <span id="user-name-display" style="font-size:0.78rem;font-weight:800;">—</span>
-      <span>Niv. <span id="hud-level">1</span></span>
+    <div class="xp-row">
+      <span id="user-name-display" style="font-weight:700;color:rgba(255,255,255,0.7);">—</span>
+      <span>Niveau <span id="hud-level">1</span></span>
     </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
+    <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
 
   <main>
     <div class="hero">
-      <h2>Bonjour <span id="prenom-hero"></span>!</h2>
+      <h2>Bonjour <span id="prenom-hero">!</span></h2>
       <p>Choisis une matière pour commencer ✨</p>
     </div>
 
     <div class="teacher-zone">
-      <div id="teacher-avatar" class="avatar-idle">🦉</div>
+      <div id="teacher-avatar" class="avatar-idle">
+        <div class="teacher-frame">
+          <div class="teacher-ring"></div>
+          <div class="teacher-emoji">👩‍🏫</div>
+          <div class="teacher-name-badge">Mme Sophie</div>
+        </div>
+      </div>
       <div class="speech-bubble" id="teacher-bubble">
         Choisis une matière et on commence !
       </div>
@@ -69,21 +75,17 @@
     window.addEventListener('load', () => {
       Teacher.init();
       initProfileSystem((name) => {
-        document.getElementById('prenom-hero').textContent = name;
+        document.getElementById('prenom-hero').textContent = name + ' !';
         setTimeout(() => {
-          Teacher.encourager("Bonjour " + name + " ! Je suis Professeur Chouette. Clique sur une matière pour qu'on commence ensemble !");
-          document.getElementById('teacher-bubble').textContent = "Clique sur une matière pour commencer !";
-        }, 700);
+          Teacher.encourager("Bonjour " + name + " ! Je suis Madame Sophie, ta professeure. Clique sur une matière pour commencer !");
+        }, 600);
       });
     });
 
     function activerMicro() {
       if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
       Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter((t) => {
-          document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"";
-          Teacher.parler("Tu as dit : " + t + " . Clique sur une matière pour commencer !");
-        });
+        Teacher.ecouter(t => Teacher.parler("Tu as dit : " + t + ". Choisis une matière !"));
       });
     }
   </script>

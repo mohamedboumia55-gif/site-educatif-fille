@@ -7,185 +7,89 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-
   <header class="hud">
     <div class="hud-top">
       <a href="../index.html" class="hud-back">←</a>
       <div class="hud-title">🔤 Conjugaison</div>
       <div class="hud-stats">
-        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
-        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
-        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <span class="stat-chip">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-chip">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-chip" id="hud-hearts">❤️❤️❤️❤️❤️</span>
         <button class="btn-logout" onclick="Profiles.logout()">🔄</button>
       </div>
     </div>
-    <div class="xp-label">
-      <span id="user-name-display"></span>
-      <span>Niv. <span id="hud-level">1</span></span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
+    <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
+    <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
-
   <main>
     <div class="teacher-zone">
-      <div id="teacher-avatar" class="avatar-idle">🦉</div>
-      <div class="speech-bubble" id="teacher-bubble">Entraînons-nous à conjuguer les verbes !</div>
+      <div id="teacher-avatar" class="avatar-idle">
+        <div class="teacher-frame">
+          <div class="teacher-ring"></div>
+          <div class="teacher-emoji">👩‍🏫</div>
+          <div class="teacher-name-badge">Mme Sophie</div>
+        </div>
+      </div>
+      <div class="speech-bubble" id="teacher-bubble">Entraînons-nous à conjuguer !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
-
     <div class="exercice-zone">
       <div class="exercice-card" id="lecon-card">
         <h2 id="temps-titre">⏱️ Le temps du jour</h2>
         <div class="lecon-box" id="lecon-contenu"></div>
-        <div style="text-align:center;">
-          <button class="valider-btn green" onclick="commencerExercices()" style="margin-top:6px;">Je suis prête ! ➜</button>
-        </div>
+        <div style="text-align:center;"><button class="btn-action btn-green" onclick="commencerExercices()">Je suis prête ! →</button></div>
       </div>
-
       <div class="exercice-card" id="exo-card" style="display:none;">
         <h2>✍️ Complète la phrase</h2>
-        <p id="phrase-trouee" style="font-size:1.15rem;font-weight:800;text-align:center;margin:14px 0;color:#1e1b4b;line-height:1.7;"></p>
-        <p style="color:#9ca3af;font-style:italic;text-align:center;font-size:0.88rem;" id="indice-temps"></p>
+        <p id="phrase-trouee" style="font-size:1.1rem;font-weight:700;text-align:center;margin:14px 0;color:white;line-height:1.7;"></p>
+        <p style="color:rgba(255,255,255,0.4);font-style:italic;text-align:center;font-size:0.85rem;" id="indice-temps"></p>
         <div class="choix-grid" id="choix-conj"></div>
         <div class="feedback" id="feedback-conj"></div>
       </div>
-
-      <div style="text-align:center;gap:10px;display:flex;justify-content:center;flex-wrap:wrap;">
-        <button class="valider-btn green" onclick="prochainExercice()" id="btn-suivant" style="display:none;">Question suivante ➜</button>
-        <button class="valider-btn" onclick="changerTemps()" id="btn-temps" style="display:none;">Temps suivant ➜</button>
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn-action btn-green" onclick="prochainExercice()" id="btn-suivant" style="display:none;">Question suivante →</button>
+        <button class="btn-action btn-primary" onclick="changerTemps()" id="btn-temps" style="display:none;">Temps suivant →</button>
       </div>
     </div>
   </main>
-
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
     const lecons = [
-      {
-        temps: "Présent de l'indicatif",
-        explication: "Le présent décrit une action qui se passe maintenant.\n\n📌 CHANTER : Je chante · Tu chantes · Il chante · Nous chantons · Vous chantez · Ils chantent\n\n💡 Terminaisons courantes : -e, -es, -e, -ons, -ez, -ent",
-        exercices: [
-          { phrase:"Elle ___ (chanter) une belle chanson.", bonne:"chante", choix:["chante","chantait","chantera","a chanté"] },
-          { phrase:"Nous ___ (manger) à midi.", bonne:"mangeons", choix:["mangeons","mangions","mangerons","avons mangé"] },
-          { phrase:"Tu ___ (finir) tes devoirs.", bonne:"finis", choix:["finis","finissais","finiras","as fini"] }
-        ]
-      },
-      {
-        temps: "Imparfait de l'indicatif",
-        explication: "L'imparfait décrit une action passée qui durait ou une habitude.\n\n📌 JOUER : Je jouais · Tu jouais · Il jouait · Nous jouions · Vous jouiez · Ils jouaient\n\n💡 Terminaisons : -ais, -ais, -ait, -ions, -iez, -aient",
-        exercices: [
-          { phrase:"Quand j'étais petit, je ___ (jouer) dehors.", bonne:"jouais", choix:["jouais","joue","jouerai","ai joué"] },
-          { phrase:"Il ___ (faire) beau tous les étés.", bonne:"faisait", choix:["faisait","fait","fera","a fait"] },
-          { phrase:"Nous ___ (partir) en vacances chaque année.", bonne:"partions", choix:["partions","partons","partirons","sommes partis"] }
-        ]
-      },
-      {
-        temps: "Futur simple",
-        explication: "Le futur simple décrit une action qui se passera plus tard.\n\n📌 PARLER : Je parlerai · Tu parleras · Il parlera · Nous parlerons · Vous parlerez · Ils parleront\n\n💡 Terminaisons : -ai, -as, -a, -ons, -ez, -ont",
-        exercices: [
-          { phrase:"Demain, je ___ (aller) à l'école.", bonne:"irai", choix:["irai","vais","allais","suis allé"] },
-          { phrase:"Tu ___ (apprendre) beaucoup de choses.", bonne:"apprendras", choix:["apprendras","apprends","apprenais","as appris"] },
-          { phrase:"Ils ___ (venir) nous rendre visite.", bonne:"viendront", choix:["viendront","viennent","venaient","sont venus"] }
-        ]
-      }
+      { temps:"Présent de l'indicatif", explication:"Le présent = action en cours maintenant.\n\n📌 CHANTER : Je chante · Tu chantes · Il chante\nNous chantons · Vous chantez · Ils chantent\n\n💡 Terminaisons : -e, -es, -e, -ons, -ez, -ent",
+        exercices:[{phrase:"Elle ___ (chanter) une belle chanson.",bonne:"chante",choix:["chante","chantait","chantera","a chanté"]},{phrase:"Nous ___ (manger) à midi.",bonne:"mangeons",choix:["mangeons","mangions","mangerons","avons mangé"]},{phrase:"Tu ___ (finir) tes devoirs.",bonne:"finis",choix:["finis","finissais","finiras","as fini"]}]},
+      { temps:"Imparfait de l'indicatif", explication:"L'imparfait = action passée qui durait ou habitude.\n\n📌 JOUER : Je jouais · Tu jouais · Il jouait\nNous jouions · Vous jouiez · Ils jouaient\n\n💡 Terminaisons : -ais, -ais, -ait, -ions, -iez, -aient",
+        exercices:[{phrase:"Quand j'étais petit, je ___ (jouer) dehors.",bonne:"jouais",choix:["jouais","joue","jouerai","ai joué"]},{phrase:"Il ___ (faire) beau tous les étés.",bonne:"faisait",choix:["faisait","fait","fera","a fait"]},{phrase:"Nous ___ (partir) en vacances chaque année.",bonne:"partions",choix:["partions","partons","partirons","sommes partis"]}]},
+      { temps:"Futur simple", explication:"Le futur simple = action qui se passera plus tard.\n\n📌 PARLER : Je parlerai · Tu parleras · Il parlera\nNous parlerons · Vous parlerez · Ils parleront\n\n💡 Terminaisons : -ai, -as, -a, -ons, -ez, -ont",
+        exercices:[{phrase:"Demain, je ___ (aller) à l'école.",bonne:"irai",choix:["irai","vais","allais","suis allé"]},{phrase:"Tu ___ (apprendre) beaucoup de choses.",bonne:"apprendras",choix:["apprendras","apprends","apprenais","as appris"]},{phrase:"Ils ___ (venir) nous rendre visite.",bonne:"viendront",choix:["viendront","viennent","venaient","sont venus"]}]}
     ];
-
-    let tempsIndex = 0, exoIndex = 0;
-
-    window.addEventListener('load', () => {
-      Teacher.init();
-      initProfileSystem((name) => {
-        setTimeout(() => {
-          afficherLecon(0);
-          Teacher.expliquer("Bienvenue en conjugaison " + name + " ! Lis bien la leçon, ensuite on s'entraîne !");
-        }, 700);
-      });
-    });
-
-    function afficherLecon(ti) {
-      const l = lecons[ti];
-      document.getElementById('temps-titre').textContent = '⏱️ ' + l.temps;
-      document.getElementById('lecon-contenu').innerHTML = l.explication.replace(/\n/g,'<br>');
-      document.getElementById('lecon-card').style.display = 'block';
-      document.getElementById('exo-card').style.display = 'none';
-      document.getElementById('btn-suivant').style.display = 'none';
-      document.getElementById('btn-temps').style.display = 'none';
-      exoIndex = 0;
-      Teacher.expliquer(l.temps + ". " + l.explication.split('\n')[0]);
+    let ti=0, ei=0;
+    window.addEventListener('load',()=>{Teacher.init();initProfileSystem(name=>{setTimeout(()=>{afficherLecon(0);Teacher.expliquer("Bienvenue en conjugaison "+name+" ! Lis la leçon, ensuite on s'entraîne !");},700);});});
+    function afficherLecon(i){const l=lecons[i];document.getElementById('temps-titre').textContent='⏱️ '+l.temps;document.getElementById('lecon-contenu').innerHTML=l.explication.replace(/\n/g,'<br>');document.getElementById('lecon-card').style.display='block';document.getElementById('exo-card').style.display='none';document.getElementById('btn-suivant').style.display='none';document.getElementById('btn-temps').style.display='none';ei=0;}
+    function commencerExercices(){document.getElementById('lecon-card').style.display='none';document.getElementById('exo-card').style.display='block';afficherExercice();Teacher.poserQuestion("C'est parti ! Complète les phrases.");}
+    function afficherExercice(){
+      const exos=lecons[ti].exercices;
+      if(ei>=exos.length){document.getElementById('exo-card').innerHTML='<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Bravo ! Tu maîtrises ce temps !</h2>';lancerConfettis();Profiles.saveProgression('conjugaison',{[lecons[ti].temps]:true,date:new Date().toLocaleDateString()});document.getElementById('btn-temps').style.display=ti<lecons.length-1?'inline-flex':'none';Teacher.encourager("Félicitations ! Tu maîtrises "+lecons[ti].temps+" !");return;}
+      const ex=exos[ei];
+      document.getElementById('phrase-trouee').textContent=ex.phrase;
+      document.getElementById('indice-temps').textContent='⏱️ '+lecons[ti].temps;
+      document.getElementById('feedback-conj').className='feedback';
+      document.getElementById('btn-suivant').style.display='none';
+      let html='';ex.choix.forEach(c=>{html+=`<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`;});
+      document.getElementById('choix-conj').innerHTML=html;
+      Teacher.poserQuestion(ex.phrase.replace('___','...'));
     }
-
-    function commencerExercices() {
-      document.getElementById('lecon-card').style.display = 'none';
-      document.getElementById('exo-card').style.display = 'block';
-      afficherExercice();
-      Teacher.poserQuestion("C'est parti ! Complète les phrases.");
+    function verifier(rep,bonne,btn){
+      document.querySelectorAll('.choix-btn').forEach(b=>b.disabled=true);
+      const fb=document.getElementById('feedback-conj');
+      if(rep===bonne){btn.classList.add('correct');fb.textContent='✅ Parfait ! "'+bonne+'" est la bonne forme.';fb.className='feedback bravo';SFX.correct();lancerConfettis();const lu=Profiles.addXP(10);updateHUD();if(lu){SFX.levelUp();afficherToast();}Teacher.encourager("Parfait ! "+bonne+" est la bonne réponse !");}
+      else{btn.classList.add('incorrect');document.querySelectorAll('.choix-btn')[lecons[ti].exercices[ei].choix.indexOf(bonne)].classList.add('correct');fb.textContent='❌ La bonne réponse était : '+bonne;fb.className='feedback erreur';SFX.incorrect();Profiles.loseHeart();updateHUD();Teacher.consoler("Pas tout à fait. La bonne réponse était : "+bonne);}
+      document.getElementById('btn-suivant').style.display='inline-flex';
     }
-
-    function afficherExercice() {
-      const exos = lecons[tempsIndex].exercices;
-      if (exoIndex >= exos.length) {
-        document.getElementById('exo-card').innerHTML = '<h2 style="text-align:center;color:#7c3aed">🎉 Bravo ! Tu as réussi tous les exercices !</h2>';
-        lancerConfettis();
-        Profiles.saveProgression('conjugaison', { [lecons[tempsIndex].temps]: true, date: new Date().toLocaleDateString() });
-        document.getElementById('btn-temps').style.display = tempsIndex < lecons.length - 1 ? 'inline-block' : 'none';
-        Teacher.encourager("Félicitations ! Tu maîtrises " + lecons[tempsIndex].temps + " !");
-        return;
-      }
-      const ex = exos[exoIndex];
-      document.getElementById('phrase-trouee').textContent = ex.phrase;
-      document.getElementById('indice-temps').textContent = '⏱️ ' + lecons[tempsIndex].temps;
-      document.getElementById('feedback-conj').className = 'feedback';
-      document.getElementById('btn-suivant').style.display = 'none';
-
-      let html = '';
-      ex.choix.forEach(c => {
-        html += `<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`;
-      });
-      document.getElementById('choix-conj').innerHTML = html;
-      Teacher.poserQuestion(ex.phrase.replace('___', '...'));
-    }
-
-    function verifier(reponse, bonne, btn) {
-      document.querySelectorAll('.choix-btn').forEach(b => b.disabled = true);
-      const fb = document.getElementById('feedback-conj');
-      if (reponse === bonne) {
-        btn.classList.add('correct');
-        fb.textContent = '✅ Parfait ! La bonne forme est : ' + bonne;
-        fb.className = 'feedback bravo';
-        SFX.correct(); lancerConfettis();
-        document.getElementById('teacher-avatar').className = 'avatar-celebrate';
-        setTimeout(() => document.getElementById('teacher-avatar').className = 'avatar-idle', 600);
-        const levelUp = Profiles.addXP(10); updateHUD();
-        if (levelUp) { SFX.levelUp(); afficherToast(); }
-        Teacher.encourager("Parfait ! " + bonne + " est la bonne réponse. Continue !");
-      } else {
-        btn.classList.add('incorrect');
-        document.querySelectorAll('.choix-btn')[lecons[tempsIndex].exercices[exoIndex].choix.indexOf(bonne)].classList.add('correct');
-        fb.textContent = '❌ La bonne réponse était : ' + bonne;
-        fb.className = 'feedback erreur';
-        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
-        Teacher.consoler("Pas tout à fait. La bonne réponse était : " + bonne);
-      }
-      document.getElementById('btn-suivant').style.display = 'inline-block';
-    }
-
-    function prochainExercice() { exoIndex++; afficherExercice(); }
-    function changerTemps() { tempsIndex++; afficherLecon(tempsIndex); }
-
-    function afficherToast() {
-      const t = document.createElement('div');
-      t.className = 'level-up-toast';
-      t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3200);
-    }
-
-    function activerMicro() {
-      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
-      Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"");
-      });
-    }
+    function prochainExercice(){ei++;afficherExercice();}
+    function changerTemps(){ti++;afficherLecon(ti);Teacher.expliquer("Maintenant on passe au "+lecons[ti].temps+". Lis bien la leçon !");}
+    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
+    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
   </script>
 </body>
 </html>

@@ -4,13 +4,12 @@ const Teacher = {
   voiceFR: null,
   onResult: null,
   isListening: false,
-  isSpeaking: false,
 
   init() {
     const loadVoice = () => {
       const voices = this.synth.getVoices();
       this.voiceFR =
-        voices.find(v => v.lang === 'fr-FR' && /female|femme|amelie|thomas|julie/i.test(v.name)) ||
+        voices.find(v => v.lang === 'fr-FR' && /female|femme|julie|amelie/i.test(v.name)) ||
         voices.find(v => v.lang === 'fr-FR') ||
         voices.find(v => v.lang.startsWith('fr')) || null;
     };
@@ -23,161 +22,118 @@ const Teacher = {
       this.recognition.lang = 'fr-FR';
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
-      this.recognition.onresult = (e) => {
-        const texte = e.results[0][0].transcript.trim();
-        if (this.onResult) this.onResult(texte);
-      };
-      this.recognition.onend = () => { this.isListening = false; this._updateMicBtn(false); };
-      this.recognition.onerror = () => { this.isListening = false; this._updateMicBtn(false); };
+      this.recognition.onresult = e => { if (this.onResult) this.onResult(e.results[0][0].transcript.trim()); };
+      this.recognition.onend  = () => { this.isListening = false; this._updateMicBtn(false); this._setState('idle'); };
+      this.recognition.onerror= () => { this.isListening = false; this._updateMicBtn(false); this._setState('idle'); };
     }
   },
 
-  // Type: 'normal' | 'encourage' | 'question' | 'explain' | 'sad'
-  parler(texte, callback, type = 'normal') {
+  _speak(texte, rate, pitch, callback) {
     this.synth.cancel();
     const u = new SpeechSynthesisUtterance(texte);
-    u.lang = 'fr-FR';
+    u.lang = 'fr-FR'; u.rate = rate; u.pitch = pitch;
     if (this.voiceFR) u.voice = this.voiceFR;
-
-    switch (type) {
-      case 'encourage': u.rate = 1.05; u.pitch = 1.35; break;
-      case 'question':  u.rate = 0.92; u.pitch = 1.15; break;
-      case 'explain':   u.rate = 0.85; u.pitch = 1.0;  break;
-      case 'sad':       u.rate = 0.88; u.pitch = 0.9;  break;
-      default:          u.rate = 0.95; u.pitch = 1.1;  break;
-    }
-
-    this.isSpeaking = true;
-    this._setAvatarState('talking');
-
-    u.onend = () => {
-      this.isSpeaking = false;
-      this._setAvatarState('idle');
-      if (callback) callback();
-    };
-    u.onerror = () => {
-      this.isSpeaking = false;
-      this._setAvatarState('idle');
-      if (callback) callback();
-    };
+    this._setState('talking');
+    u.onend = u.onerror = () => { this._setState('idle'); if (callback) callback(); };
     this.synth.speak(u);
+    this._updateBubble(texte);
   },
 
-  encourager(texte, callback) { this.parler(texte, callback, 'encourage'); },
-  expliquer(texte, callback)  { this.parler(texte, callback, 'explain'); },
-  poserQuestion(texte, callback) { this.parler(texte, callback, 'question'); },
-  consoler(texte, callback)   { this.parler(texte, callback, 'sad'); },
+  parler(t, cb)     { this._speak(t, 0.95, 1.1, cb); },
+  encourager(t, cb) { this._speak(t, 1.05, 1.35, cb); },
+  expliquer(t, cb)  { this._speak(t, 0.85, 1.0,  cb); },
+  poserQuestion(t, cb){ this._speak(t, 0.92, 1.15, cb); },
+  consoler(t, cb)   { this._speak(t, 0.88, 0.9,  cb); },
 
   ecouter(callback) {
-    if (!this.recognition) { alert("Utilise Chrome ou Edge pour la reconnaissance vocale."); return; }
+    if (!this.recognition) { alert("Utilise Chrome ou Edge."); return; }
     this.onResult = callback;
     this.isListening = true;
     this._updateMicBtn(true);
-    this._setAvatarState('listening');
+    this._setState('listening');
     this.recognition.start();
   },
 
-  arreterEcoute() {
-    if (this.recognition && this.isListening) this.recognition.stop();
+  arreterEcoute() { if (this.recognition && this.isListening) this.recognition.stop(); },
+
+  _setState(state) {
+    const el = document.getElementById('teacher-avatar');
+    if (el) el.className = 'avatar-' + state;
   },
 
-  _setAvatarState(state) {
-    const a = document.getElementById('teacher-avatar');
-    if (!a) return;
-    a.className = 'avatar-' + state;
+  _updateBubble(texte) {
+    const b = document.getElementById('teacher-bubble');
+    if (b) { b.style.opacity='0'; setTimeout(()=>{ b.textContent=texte; b.style.opacity='1'; }, 150); }
   },
 
   _updateMicBtn(actif) {
     const btn = document.getElementById('btn-micro');
     if (!btn) return;
-    btn.innerHTML = actif
-      ? '<span class="mic-waves">🔴</span> J\'écoute...'
-      : '🎤 Parler';
+    btn.textContent = actif ? '🔴 J\'écoute...' : '🎤 Parler';
     btn.classList.toggle('actif', actif);
   }
 };
 
-// Effets sonores via Web Audio API
+// Sons via Web Audio API
 const SFX = {
   ctx: null,
-  _getCtx() {
-    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    return this.ctx;
-  },
+  _ctx() { return this.ctx || (this.ctx = new (window.AudioContext || window.webkitAudioContext)()); },
   correct() {
     try {
-      const ctx = this._getCtx();
-      [523, 659, 784].forEach((freq, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = freq;
-        o.type = 'sine';
-        g.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
-        o.start(ctx.currentTime + i * 0.12);
-        o.stop(ctx.currentTime + i * 0.12 + 0.3);
+      const c = this._ctx();
+      [523,659,784].forEach((f,i) => {
+        const o=c.createOscillator(), g=c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.frequency.value=f; o.type='sine';
+        g.gain.setValueAtTime(0.25, c.currentTime+i*0.13);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+i*0.13+0.35);
+        o.start(c.currentTime+i*0.13); o.stop(c.currentTime+i*0.13+0.35);
       });
-    } catch(e) {}
+    } catch(e){}
   },
   incorrect() {
     try {
-      const ctx = this._getCtx();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = 200;
-      o.type = 'sawtooth';
-      g.gain.setValueAtTime(0.2, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      o.start(ctx.currentTime);
-      o.stop(ctx.currentTime + 0.4);
-    } catch(e) {}
+      const c=this._ctx(), o=c.createOscillator(), g=c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.frequency.value=180; o.type='sawtooth';
+      g.gain.setValueAtTime(0.18, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+0.45);
+      o.start(c.currentTime); o.stop(c.currentTime+0.45);
+    } catch(e){}
   },
   levelUp() {
     try {
-      const ctx = this._getCtx();
-      [523, 659, 784, 1047].forEach((freq, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = freq;
-        o.type = 'sine';
-        g.gain.setValueAtTime(0.35, ctx.currentTime + i * 0.1);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.4);
-        o.start(ctx.currentTime + i * 0.1);
-        o.stop(ctx.currentTime + i * 0.1 + 0.4);
+      const c=this._ctx();
+      [523,659,784,1047].forEach((f,i) => {
+        const o=c.createOscillator(), g=c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.frequency.value=f; o.type='sine';
+        g.gain.setValueAtTime(0.3, c.currentTime+i*0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+i*0.1+0.4);
+        o.start(c.currentTime+i*0.1); o.stop(c.currentTime+i*0.1+0.4);
       });
-    } catch(e) {}
+    } catch(e){}
   }
 };
 
-// Confettis sur bonne réponse
+// Confettis
 function lancerConfettis() {
-  const colors = ['#ff6b9d','#c44dff','#ffe066','#4dffb8','#4db8ff'];
-  for (let i = 0; i < 40; i++) {
-    const c = document.createElement('div');
-    c.style.cssText = `
-      position:fixed;pointer-events:none;z-index:9999;
-      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:${Math.random()>0.5?'50%':'2px'};
-      left:${Math.random()*100}vw;top:-10px;
-      animation:confetti-fall ${1.2+Math.random()*1.5}s ease-in forwards;
-      transform:rotate(${Math.random()*360}deg);
-    `;
-    document.body.appendChild(c);
-    setTimeout(() => c.remove(), 3000);
+  const cols = ['#a5b4fc','#fb7185','#fde68a','#6ee7b7','#93c5fd','#f9a8d4'];
+  for (let i=0; i<50; i++) {
+    const d = document.createElement('div');
+    const size = 5 + Math.random()*9;
+    d.style.cssText = `position:fixed;pointer-events:none;z-index:9999;
+      width:${size}px;height:${size}px;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      left:${Math.random()*100}vw;top:-12px;
+      animation:cffall ${1.3+Math.random()*1.6}s ease-in forwards;
+      transform:rotate(${Math.random()*360}deg);opacity:0.9;`;
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 3200);
   }
 }
+(()=>{ const s=document.createElement('style'); s.textContent='@keyframes cffall{to{transform:translateY(110vh) rotate(800deg);opacity:0}}'; document.head.appendChild(s); })();
 
-// Injection CSS confettis
-(function() {
-  const s = document.createElement('style');
-  s.textContent = `
-    @keyframes confetti-fall {
-      to { transform: translateY(105vh) rotate(720deg); opacity:0; }
-    }
-  `;
-  document.head.appendChild(s);
-})();
+// Speech bubble fade
+(()=>{ const s=document.createElement('style'); s.textContent='#teacher-bubble{transition:opacity 0.15s ease;}'; document.head.appendChild(s); })();

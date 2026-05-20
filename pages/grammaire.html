@@ -7,88 +7,66 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-
   <header class="hud">
     <div class="hud-top">
       <a href="../index.html" class="hud-back">←</a>
       <div class="hud-title">✏️ Grammaire</div>
       <div class="hud-stats">
-        <span class="stat-pill">🔥 <span id="hud-streak">0</span></span>
-        <span class="stat-pill">⭐ <span id="hud-xp">0</span> XP</span>
-        <span class="stat-pill" id="hud-hearts">❤️❤️❤️❤️❤️</span>
+        <span class="stat-chip">🔥 <span id="hud-streak">0</span></span>
+        <span class="stat-chip">⭐ <span id="hud-xp">0</span> XP</span>
+        <span class="stat-chip" id="hud-hearts">❤️❤️❤️❤️❤️</span>
         <button class="btn-logout" onclick="Profiles.logout()">🔄</button>
       </div>
     </div>
-    <div class="xp-label">
-      <span id="user-name-display"></span>
-      <span>Niv. <span id="hud-level">1</span></span>
-    </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="hud-xp-bar"></div></div>
+    <div class="xp-row"><span id="user-name-display"></span><span>Niveau <span id="hud-level">1</span></span></div>
+    <div class="xp-track"><div class="xp-fill" id="hud-xp-bar"></div></div>
   </header>
-
   <main>
     <div class="teacher-zone">
-      <div id="teacher-avatar" class="avatar-idle">🦉</div>
-      <div class="speech-bubble" id="teacher-bubble">On va identifier la nature des mots. Prête ?</div>
+      <div id="teacher-avatar" class="avatar-idle">
+        <div class="teacher-frame">
+          <div class="teacher-ring"></div>
+          <div class="teacher-emoji">👩‍🏫</div>
+          <div class="teacher-name-badge">Mme Sophie</div>
+        </div>
+      </div>
+      <div class="speech-bubble" id="teacher-bubble">On va identifier la nature des mots !</div>
       <button id="btn-micro" onclick="activerMicro()">🎤 Parler</button>
     </div>
-
     <div class="exercice-zone">
       <div class="exercice-card">
-        <h2 id="exercice-titre">📝 Quelle est la nature de ce mot ?</h2>
+        <h2>📝 Quelle est la nature de ce mot ?</h2>
         <div class="lecon-box" id="lecon"></div>
         <div class="mot-cible" id="mot-cible"></div>
-        <p style="text-align:center;color:#6b7280;font-style:italic;font-size:0.9rem;margin-bottom:4px;" id="phrase-contexte"></p>
+        <p style="text-align:center;color:rgba(255,255,255,0.4);font-style:italic;font-size:0.85rem;margin-bottom:4px;" id="phrase-contexte"></p>
         <div class="choix-grid" id="choix-container"></div>
         <div class="feedback" id="feedback-gram"></div>
       </div>
-
       <div style="text-align:center;">
-        <button class="valider-btn blue" onclick="prochainExercice()" id="btn-suivant" style="display:none;">
-          Question suivante ➜
-        </button>
+        <button class="btn-action btn-blue" onclick="prochainExercice()" id="btn-suivant" style="display:none;">Question suivante →</button>
       </div>
     </div>
   </main>
-
   <script src="../js/teacher.js"></script>
   <script src="../js/profiles.js"></script>
   <script>
     const exercices = [
-      { mot:"chien", phrase:"Le chien court dans le jardin.", bonne:"Nom commun",
-        choix:["Nom commun","Verbe","Adjectif","Article"],
-        lecon:"Un nom commun désigne une chose, un animal ou une personne. Ex : chat, maison, enfant." },
-      { mot:"court", phrase:"Le chien court dans le jardin.", bonne:"Verbe",
-        choix:["Nom commun","Verbe","Adjectif","Préposition"],
-        lecon:"Un verbe exprime une action ou un état. Ex : manger, dormir, être, avoir." },
-      { mot:"Le", phrase:"Le chien court dans le jardin.", bonne:"Article",
-        choix:["Adjectif","Verbe","Article","Nom commun"],
-        lecon:"Un article précède un nom. Ex : le, la, les, un, une, des." },
-      { mot:"petit", phrase:"Un petit chat dort sur le canapé.", bonne:"Adjectif",
-        choix:["Nom commun","Verbe","Adjectif","Adverbe"],
-        lecon:"Un adjectif qualificatif donne une information sur un nom. Ex : grand, beau, rouge." },
-      { mot:"dans", phrase:"Le chien court dans le jardin.", bonne:"Préposition",
-        choix:["Article","Verbe","Adjectif","Préposition"],
-        lecon:"Une préposition relie des mots. Ex : dans, sur, sous, avec, pour, à, de." }
+      { mot:"chien",  phrase:"Le chien court dans le jardin.", bonne:"Nom commun",  choix:["Nom commun","Verbe","Adjectif","Article"],      lecon:"Un nom commun désigne une chose, un animal ou une personne. Ex : chat, maison, enfant." },
+      { mot:"court",  phrase:"Le chien court dans le jardin.", bonne:"Verbe",        choix:["Nom commun","Verbe","Adjectif","Préposition"],  lecon:"Un verbe exprime une action ou un état. Ex : manger, dormir, être, avoir." },
+      { mot:"Le",     phrase:"Le chien court dans le jardin.", bonne:"Article",      choix:["Adjectif","Verbe","Article","Nom commun"],      lecon:"Un article précède un nom. Ex : le, la, les, un, une, des." },
+      { mot:"petit",  phrase:"Un petit chat dort sur le canapé.", bonne:"Adjectif", choix:["Nom commun","Verbe","Adjectif","Adverbe"],       lecon:"Un adjectif qualificatif décrit un nom. Ex : grand, beau, rouge, gentil." },
+      { mot:"dans",   phrase:"Le chien court dans le jardin.", bonne:"Préposition", choix:["Article","Verbe","Adjectif","Préposition"],      lecon:"Une préposition relie des mots. Ex : dans, sur, sous, avec, pour, à, de." }
     ];
-
     let index = 0;
-
     window.addEventListener('load', () => {
       Teacher.init();
-      initProfileSystem((name) => {
-        setTimeout(() => {
-          Teacher.encourager("Bienvenue en grammaire " + name + " ! On va identifier la nature des mots. C'est parti !");
-          afficherExercice(0);
-        }, 700);
-      });
+      initProfileSystem(name => { setTimeout(() => { Teacher.encourager("Bienvenue en grammaire " + name + " ! On identifie la nature des mots. C'est parti !"); afficherExercice(0); }, 700); });
     });
-
     function afficherExercice(i) {
       if (i >= exercices.length) {
-        document.querySelector('.exercice-card').innerHTML = '<h2 style="text-align:center;color:#7c3aed">🎉 Bravo ! Tu as terminé la grammaire !</h2>';
-        Profiles.saveProgression('grammaire', { termine: true, date: new Date().toLocaleDateString() });
-        Teacher.encourager("Félicitations ! Tu as terminé tous les exercices de grammaire. Tu es vraiment très forte !");
+        document.querySelector('.exercice-card').innerHTML = '<h2 style="text-align:center;color:#a5b4fc;font-size:1.3rem;">🎉 Bravo ! Grammaire terminée !</h2>';
+        Profiles.saveProgression('grammaire',{termine:true,date:new Date().toLocaleDateString()});
+        lancerConfettis(); Teacher.encourager("Félicitations ! Tu as terminé tous les exercices de grammaire !");
         return;
       }
       const ex = exercices[i];
@@ -97,60 +75,34 @@
       document.getElementById('lecon').textContent = '💡 ' + ex.lecon;
       document.getElementById('feedback-gram').className = 'feedback';
       document.getElementById('btn-suivant').style.display = 'none';
-
       let html = '';
-      ex.choix.forEach(c => {
-        html += `<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`;
-      });
+      ex.choix.forEach(c => { html += `<button class="choix-btn" onclick="verifier('${c}','${ex.bonne}',this)">${c}</button>`; });
       document.getElementById('choix-container').innerHTML = html;
       Teacher.poserQuestion("Quelle est la nature du mot : " + ex.mot + " ?");
     }
-
-    function verifier(reponse, bonne, btn) {
-      document.querySelectorAll('.choix-btn').forEach(b => b.disabled = true);
+    function verifier(rep, bonne, btn) {
+      document.querySelectorAll('.choix-btn').forEach(b => b.disabled=true);
       const fb = document.getElementById('feedback-gram');
-
-      if (reponse === bonne) {
-        btn.classList.add('correct');
-        fb.textContent = '✅ Excellent ! "' + bonne + '", c\'est juste !';
-        fb.className = 'feedback bravo';
-        SFX.correct();
-        lancerConfettis();
-        document.getElementById('teacher-avatar').className = 'avatar-celebrate';
-        setTimeout(() => document.getElementById('teacher-avatar').className = 'avatar-idle', 600);
-        const levelUp = Profiles.addXP(10);
-        updateHUD();
-        if (levelUp) { SFX.levelUp(); afficherToastNiveau(); }
-        Teacher.encourager("Excellent ! " + bonne + ", c'est la bonne réponse. Bravo !");
+      if (rep === bonne) {
+        btn.classList.add('correct'); fb.textContent='✅ Excellent ! "'+bonne+'", c\'est juste !'; fb.className='feedback bravo';
+        SFX.correct(); lancerConfettis();
+        document.querySelector('.teacher-emoji').style.animation='teacher-celebrate 0.5s ease-in-out';
+        setTimeout(()=>document.querySelector('.teacher-emoji').style.animation='',600);
+        const lu=Profiles.addXP(10); updateHUD();
+        if(lu){SFX.levelUp();afficherToast();}
+        Teacher.encourager("Excellent ! "+bonne+" c'est la bonne réponse. Bravo !");
       } else {
         btn.classList.add('incorrect');
         document.querySelectorAll('.choix-btn')[exercices[index].choix.indexOf(bonne)].classList.add('correct');
-        fb.textContent = '❌ Pas tout à fait. C\'est un ' + bonne;
-        fb.className = 'feedback erreur';
-        SFX.incorrect();
-        Profiles.loseHeart();
-        updateHUD();
-        Teacher.consoler("Pas tout à fait. Ce mot est un " + bonne + ". Retiens bien !");
+        fb.textContent='❌ Pas tout à fait. C\'est un '+bonne; fb.className='feedback erreur';
+        SFX.incorrect(); Profiles.loseHeart(); updateHUD();
+        Teacher.consoler("Pas tout à fait. Ce mot est un "+bonne+". Retiens bien !");
       }
-      document.getElementById('btn-suivant').style.display = 'inline-block';
+      document.getElementById('btn-suivant').style.display='inline-flex';
     }
-
-    function prochainExercice() { index++; afficherExercice(index); }
-
-    function afficherToastNiveau() {
-      const t = document.createElement('div');
-      t.className = 'level-up-toast';
-      t.textContent = '🎉 Niveau ' + Profiles.getLevel() + ' atteint !';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3200);
-    }
-
-    function activerMicro() {
-      if (Teacher.isListening) { Teacher.arreterEcoute(); return; }
-      Teacher.parler("Je t'écoute !", () => {
-        Teacher.ecouter(t => document.getElementById('teacher-bubble').textContent = "Tu as dit : \"" + t + "\"");
-      });
-    }
+    function prochainExercice(){index++;afficherExercice(index);}
+    function afficherToast(){const t=document.createElement('div');t.className='level-up-toast';t.textContent='🎉 Niveau '+Profiles.getLevel()+' atteint !';document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
+    function activerMicro(){if(Teacher.isListening){Teacher.arreterEcoute();return;}Teacher.parler("Je t'écoute !",()=>{Teacher.ecouter(t=>document.getElementById('teacher-bubble').textContent="Tu as dit : \""+t+"\"");});}
   </script>
 </body>
 </html>
